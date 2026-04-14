@@ -1,0 +1,52 @@
+<resources>
+    <string name="frisbee_group_title">飞盘分组</string>
+    <string name="frisbee_group_back">返回</string>
+
+    <string name="frisbee_setup_title">分组配置</string>
+    <string name="frisbee_input_mode_label">参与人员</string>
+    <string name="frisbee_input_mode_count">数字</string>
+    <string name="frisbee_input_mode_names">名单</string>
+    <string name="frisbee_player_count_label">参与人数</string>
+    <string name="frisbee_names_label">玩家名单（每行一个）</string>
+    <string name="frisbee_names_placeholder">示例：\n张三\n李四\n王五</string>
+    <string name="frisbee_team_count_label">队伍数</string>
+    <string name="frisbee_palette_label">颜色主题</string>
+    <string name="frisbee_team_size_hint">每队 %1$s 人</string>
+
+    <string name="frisbee_mode_title">选择分组方式</string>
+    <string name="frisbee_mode_compass">罗盘模式</string>
+    <string name="frisbee_mode_compass_desc">转动手机，指向位置即对应队伍</string>
+    <string name="frisbee_mode_draw">签筒模式</string>
+    <string name="frisbee_mode_draw_desc">每次揭晓一位玩家的分组结果</string>
+
+    <string name="frisbee_compass_sensor_label">传感器状态</string>
+    <string name="frisbee_sensor_rotation_vector">指南针融合（含陀螺仪）</string>
+    <string name="frisbee_sensor_acc_mag">磁场+加速度计回退</string>
+    <string name="frisbee_sensor_unsupported">设备不支持方向传感器</string>
+    <string name="frisbee_sensor_permission_required">请先授权传感器权限</string>
+    <string name="frisbee_sensor_permission_granted">已授权传感器权限</string>
+    <string name="frisbee_sensor_permission_button">授权传感器</string>
+    <string name="frisbee_heading">当前朝向：%1$.1f°</string>
+    <string name="frisbee_gyro_speed">陀螺仪角速度：%1$.2f rad/s</string>
+    <string name="frisbee_pointer_team">当前指向：%1$s %2$s</string>
+    <string name="frisbee_open_results">查看结果</string>
+    <string name="frisbee_finish_grouping">完成分组</string>
+
+    <string name="frisbee_draw_progress">已揭晓：%1$d / %2$d</string>
+    <string name="frisbee_draw_action">揭晓下一位</string>
+    <string name="frisbee_draw_done">全部揭晓完成</string>
+
+    <string name="frisbee_results_title">分组结果</string>
+    <string name="frisbee_restart">重新开始</string>
+    <string name="frisbee_reset_to_setup">返回配置</string>
+
+    <string name="frisbee_palette_rainbow">🌈 默认多彩</string>
+    <string name="frisbee_palette_blue_purple">🔵🟣 蓝紫冷调</string>
+    <string name="frisbee_palette_green">🟢 森林绿洲</string>
+    <string name="frisbee_palette_gray">⚪ 极简灰阶</string>
+    <string name="frisbee_palette_sunset">🌇 暖阳日落</string>
+    <string name="frisbee_palette_ocean">🌊 海洋青蓝</string>
+    <string name="frisbee_palette_night">🌌 暗夜霓虹</string>
+
+    <string name="frisbee_player_index">第 %1$d 位</string>
+</resources>

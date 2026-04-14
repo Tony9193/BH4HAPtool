@@ -1,0 +1,36 @@
+<resources>
+    <string name="tetris_title">俄罗斯方块</string>
+    <string name="tetris_back">返回</string>
+
+    <string name="tetris_status_ready">待开始</string>
+    <string name="tetris_status_playing">进行中</string>
+    <string name="tetris_status_paused">已暂停</string>
+    <string name="tetris_status_over">已结束</string>
+
+    <string name="tetris_move_left">左移</string>
+    <string name="tetris_move_right">右移</string>
+    <string name="tetris_rotate">旋转</string>
+    <string name="tetris_soft_drop">下落</string>
+    <string name="tetris_hard_drop">速降</string>
+
+    <string name="tetris_new_game">新局</string>
+    <string name="tetris_pause">暂停</string>
+    <string name="tetris_resume">继续</string>
+    <string name="tetris_show_settings">设置</string>
+    <string name="tetris_hide_settings">收起设置</string>
+
+    <string name="tetris_status">状态：%1$s</string>
+    <string name="tetris_score">分数：%1$d</string>
+    <string name="tetris_level">等级：%1$d</string>
+    <string name="tetris_lines">消除行数：%1$d</string>
+    <string name="tetris_interval">下落间隔：%1$d ms</string>
+    <string name="tetris_next_piece">下一块：%1$s</string>
+    <string name="tetris_best_score">历史最高分：%1$d</string>
+    <string name="tetris_best_level">历史最高等级：%1$d</string>
+
+    <string name="tetris_settings_title">游戏设置</string>
+    <string name="tetris_start_level">起始等级</string>
+    <string name="tetris_vibration">震动反馈</string>
+    <string name="tetris_apply_settings">应用并重开</string>
+    <string name="tetris_close_settings">关闭</string>
+</resources>

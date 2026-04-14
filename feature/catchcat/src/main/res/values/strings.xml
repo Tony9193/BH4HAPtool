@@ -1,0 +1,15 @@
+<resources>
+    <string name="catch_cat_title">捉小猫</string>
+    <string name="catch_cat_back">返回</string>
+    <string name="catch_cat_description">点击圆点放置障碍。你每点一次，小猫走一步；围住它获胜，让它到边界则失败。</string>
+    <string name="catch_cat_status_label">当前状态</string>
+    <string name="catch_cat_state_playing">进行中</string>
+    <string name="catch_cat_state_win">你赢了</string>
+    <string name="catch_cat_state_lose">你输了</string>
+    <string name="catch_cat_moves">已落子：%1$d</string>
+    <string name="catch_cat_initial_walls">初始障碍：%1$d</string>
+    <string name="catch_cat_message_label">状态提示</string>
+    <string name="catch_cat_reset">重新开局</string>
+    <string name="catch_cat_undo">撤销一步</string>
+    <string name="catch_cat_help">算法借鉴自 Phaser 版本：六方向邻接网格 + 到边缘的 BFS 最短路与路径数优先策略。</string>
+</resources>

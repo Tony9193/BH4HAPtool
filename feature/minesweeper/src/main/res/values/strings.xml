@@ -1,0 +1,50 @@
+<resources>
+    <string name="minesweeper_title">扫雷</string>
+    <string name="minesweeper_back">返回</string>
+
+    <string name="minesweeper_status_ready">待开始</string>
+    <string name="minesweeper_status_playing">进行中</string>
+    <string name="minesweeper_status_paused">已暂停</string>
+    <string name="minesweeper_status_won">已胜利</string>
+    <string name="minesweeper_status_lost">已失败</string>
+
+    <string name="minesweeper_status_label">状态：%1$s</string>
+    <string name="minesweeper_mines_left">剩余雷数：%1$d</string>
+    <string name="minesweeper_elapsed">用时：%1$d s</string>
+    <string name="minesweeper_revealed">已翻开：%1$d / %2$d</string>
+
+    <string name="minesweeper_wins">胜利：%1$d</string>
+    <string name="minesweeper_losses">失败：%1$d</string>
+    <string name="minesweeper_best_easy">简单最佳：%1$s</string>
+    <string name="minesweeper_best_normal">标准最佳：%1$s</string>
+    <string name="minesweeper_best_hard">困难最佳：%1$s</string>
+
+    <string name="minesweeper_action_new_game">新局</string>
+    <string name="minesweeper_action_pause">暂停</string>
+    <string name="minesweeper_action_resume">继续</string>
+    <string name="minesweeper_action_show_settings">设置</string>
+    <string name="minesweeper_action_hide_settings">收起设置</string>
+
+    <string name="minesweeper_settings_title">游戏设置</string>
+    <string name="minesweeper_difficulty_label">难度</string>
+    <string name="minesweeper_difficulty_easy">简单</string>
+    <string name="minesweeper_difficulty_normal">标准</string>
+    <string name="minesweeper_difficulty_hard">困难</string>
+    <string name="minesweeper_difficulty_custom">自定义</string>
+
+    <string name="minesweeper_width">宽度</string>
+    <string name="minesweeper_height">高度</string>
+    <string name="minesweeper_mine_count">雷数</string>
+
+    <string name="minesweeper_first_click_safe">首点安全</string>
+    <string name="minesweeper_question_mark">启用问号标记</string>
+    <string name="minesweeper_auto_expand">自动展开空白区域</string>
+    <string name="minesweeper_sound">音效</string>
+    <string name="minesweeper_vibration">震动</string>
+
+    <string name="minesweeper_apply_settings">应用并重开</string>
+    <string name="minesweeper_close_settings">关闭</string>
+
+    <string name="minesweeper_help">操作：单击开格，长按插旗/问号；点已翻开的数字格可尝试快速展开周围。</string>
+    <string name="minesweeper_no_best">--</string>
+</resources>

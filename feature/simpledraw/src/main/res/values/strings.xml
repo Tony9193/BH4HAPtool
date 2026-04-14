@@ -1,0 +1,12 @@
+<resources>
+    <string name="common_back">返回</string>
+    <string name="common_draw">开始抽签</string>
+    <string name="common_clear">清空</string>
+
+    <string name="simple_draw_title">普通抽签</string>
+    <string name="simple_draw_description">输入候选名单后，随机抽取一位。</string>
+    <string name="simple_draw_input_label">候选名单</string>
+    <string name="simple_draw_input_placeholder">示例：小明, 小红, 小刚</string>
+    <string name="simple_draw_count">有效候选人数：%1$d</string>
+    <string name="simple_draw_result_label">抽中结果</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="shake_draw_back">返回</string>
+    <string name="shake_draw_title">摇一摇抽签</string>
+    <string name="shake_draw_input_label">候选名单</string>
+    <string name="shake_draw_input_placeholder">示例：A, B, C</string>
+    <string name="shake_draw_count">有效候选人数：%1$d</string>
+    <string name="shake_draw_manual_button">手动抽签</string>
+    <string name="shake_draw_clear_button">清空</string>
+    <string name="shake_draw_result_label">抽中结果</string>
+
+    <string name="shake_draw_sensor_mode_label">当前传感器模式</string>
+    <string name="shake_draw_sensor_mode_gyroscope">陀螺仪（优先）</string>
+    <string name="shake_draw_sensor_mode_accelerometer">加速度计（自动降级）</string>
+    <string name="shake_draw_sensor_mode_unsupported">设备不支持摇一摇传感器</string>
+    <string name="shake_draw_cooldown">触发冷却：%1$d ms</string>
+</resources>

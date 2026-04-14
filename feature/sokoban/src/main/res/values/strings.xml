@@ -1,0 +1,26 @@
+<resources>
+    <string name="sokoban_title">推箱子</string>
+    <string name="sokoban_back">返回</string>
+
+    <string name="sokoban_up">上</string>
+    <string name="sokoban_down">下</string>
+    <string name="sokoban_left">左</string>
+    <string name="sokoban_right">右</string>
+
+    <string name="sokoban_undo">撤销</string>
+    <string name="sokoban_reset">重开</string>
+    <string name="sokoban_prev_level">上一关</string>
+    <string name="sokoban_next_level">下一关</string>
+
+    <string name="sokoban_vibration">震动反馈</string>
+
+    <string name="sokoban_status_playing">进行中</string>
+    <string name="sokoban_status_won">已通关</string>
+    <string name="sokoban_status">状态：%1$s</string>
+
+    <string name="sokoban_level_progress">第 %1$d / %2$d 关：%3$s</string>
+    <string name="sokoban_moves">当前步数：%1$d</string>
+    <string name="sokoban_completed">累计通关：%1$d</string>
+    <string name="sokoban_best_moves">本关最佳：%1$s</string>
+    <string name="sokoban_no_best">--</string>
+</resources>
