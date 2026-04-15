@@ -3,20 +3,18 @@
     <string name="home_title">BH4HAPtools 工具箱</string>
     <string name="home_subtitle">离线可用的轻量工具集合，选择一个入口开始使用。</string>
 
-    <string name="tool_simple_draw_title">普通抽签</string>
-    <string name="tool_simple_draw_description">输入名单后随机抽取一位</string>
     <string name="tool_shake_draw_title">摇一摇抽签</string>
-    <string name="tool_shake_draw_description">优先陀螺仪，不可用时自动降级加速度计</string>
-    <string name="tool_catch_cat_title">捉小猫</string>
+    <string name="tool_shake_draw_description">支持名单抽签和随机数字抽取，可手动触发，也可直接摇一摇触发。</string>
+    <string name="tool_catch_cat_title">抓小猫</string>
     <string name="tool_catch_cat_description">围堵小猫，别让它逃到边缘</string>
     <string name="tool_frisbee_group_title">飞盘分组</string>
-    <string name="tool_frisbee_group_description">支持罗盘与签筒的随机公平分队</string>
+    <string name="tool_frisbee_group_description">支持罗盘与抽签的随机公平分队</string>
     <string name="tool_minesweeper_title">扫雷</string>
-    <string name="tool_minesweeper_description">支持丰富自定义选项的经典扫雷小游戏</string>
+    <string name="tool_minesweeper_description">经典扫雷玩法，支持自定义棋盘大小、雷数和辅助设置。</string>
     <string name="tool_tetris_title">俄罗斯方块</string>
     <string name="tool_tetris_description">经典堆叠消行玩法，支持速度与震动设置</string>
     <string name="tool_sokoban_title">推箱子</string>
-    <string name="tool_sokoban_description">内置 10 关，支持撤销、重开和最佳步数统计</string>
+    <string name="tool_sokoban_description">经典推箱子玩法，支持撤销、重开、选关和最优步数记录。</string>
 
     <string name="settings_title">设置</string>
     <string name="settings_theme_mode">外观模式</string>
@@ -29,6 +27,6 @@
     <string name="settings_color_green">薄荷绿</string>
     <string name="settings_color_gray">极简灰</string>
     <string name="settings_color_red">活力红</string>
-    <string name="settings_color_orange">温暖橘</string>
+    <string name="settings_color_orange">温暖橙</string>
     <string name="settings_color_teal">清新青</string>
 </resources>

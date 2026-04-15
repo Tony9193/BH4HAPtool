@@ -16,8 +16,6 @@ import com.example.bh4haptool.feature.sokoban.navigation.SokobanDestination
 import com.example.bh4haptool.feature.sokoban.ui.SokobanRoute
 import com.example.bh4haptool.feature.shakedraw.navigation.ShakeDrawDestination
 import com.example.bh4haptool.feature.shakedraw.ui.ShakeDrawRoute
-import com.example.bh4haptool.feature.simpledraw.navigation.SimpleDrawDestination
-import com.example.bh4haptool.feature.simpledraw.ui.SimpleDrawRoute
 import com.example.bh4haptool.feature.tetris.navigation.TetrisDestination
 import com.example.bh4haptool.feature.tetris.ui.TetrisRoute
 import com.example.bh4haptool.ui.home.HomeRoute
@@ -49,11 +47,6 @@ fun AppNavHost(
             SettingsRoute(
                 onBack = { navController.popBackStack() },
                 repository = repository
-            )
-        }
-        composable(route = SimpleDrawDestination.route) {
-            SimpleDrawRoute(
-                onBack = { navController.popBackStack() }
             )
         }
         composable(route = ShakeDrawDestination.route) {

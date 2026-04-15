@@ -46,6 +46,10 @@ private data class Tetromino(
     val col: Int
 )
 
+/**
+ * Pure game engine for Tetris.
+ * Keeps all rules in memory so UI only renders snapshots.
+ */
 class TetrisEngine(
     private val width: Int = 10,
     private val height: Int = 20,
@@ -120,6 +124,7 @@ class TetrisEngine(
             return true
         }
 
+        // Simple wall-kick: try one-cell horizontal adjustment.
         val kickLeft = rotated.copy(col = rotated.col - 1)
         if (canPlace(kickLeft)) {
             currentPiece = kickLeft
@@ -274,6 +279,7 @@ class TetrisEngine(
         var clearedCount = 0
         var writeRow = height - 1
 
+        // Compact non-full rows downward in one pass from bottom to top.
         for (readRow in height - 1 downTo 0) {
             val filled = board[readRow].all { value -> value != 0 }
             if (filled) {
@@ -305,6 +311,7 @@ class TetrisEngine(
     }
 
     private fun computeDropInterval(level: Int): Int {
+        // Higher level -> shorter interval, with a floor to keep gameplay controllable.
         return (780 - (level - 1) * 45).coerceAtLeast(120)
     }
 

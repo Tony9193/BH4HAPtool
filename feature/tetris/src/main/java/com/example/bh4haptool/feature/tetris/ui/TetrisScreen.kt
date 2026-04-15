@@ -41,6 +41,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.tetris.R
 import com.example.bh4haptool.feature.tetris.domain.TetrisStatus
 import com.example.bh4haptool.feature.tetris.domain.TetrominoType
@@ -54,6 +56,7 @@ fun TetrisRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = LocalHapticFeedback.current
+    val paneMode = rememberToolPaneMode()
 
     fun trigger(action: () -> Boolean, strong: Boolean = false) {
         val success = action()
@@ -77,46 +80,88 @@ fun TetrisRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            TetrisBoard(
-                board = uiState.board,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
-
-            ControlPad(
-                onLeft = { trigger(viewModel::onMoveLeft) },
-                onRight = { trigger(viewModel::onMoveRight) },
-                onRotate = { trigger(viewModel::onRotate) },
-                onSoftDrop = { trigger(viewModel::onSoftDrop) },
-                onHardDrop = { trigger(viewModel::onHardDrop, strong = true) }
-            )
-
-            ActionRow(
-                status = uiState.status,
-                onNewGame = viewModel::onNewGameClicked,
-                onPauseResume = viewModel::onPauseResumeClicked,
-                onToggleSettings = viewModel::onSettingsPanelToggle,
-                showSettings = uiState.showSettingsPanel
-            )
-
-            StatusCard(uiState = uiState)
-
-            if (uiState.showSettingsPanel) {
-                SettingsPanel(
-                    draft = uiState.settingsDraft,
-                    onStartLevelChanged = viewModel::onStartLevelChanged,
-                    onVibrationChanged = viewModel::onVibrationChanged,
-                    onApply = viewModel::onApplySettings,
-                    onClose = viewModel::onSettingsPanelToggle
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                TetrisBoard(
+                    board = uiState.board,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
+            },
+                secondary = {
+                ControlPad(
+                    onLeft = { trigger(viewModel::onMoveLeft) },
+                    onRight = { trigger(viewModel::onMoveRight) },
+                    onRotate = { trigger(viewModel::onRotate) },
+                    onSoftDrop = { trigger(viewModel::onSoftDrop) },
+                    onHardDrop = { trigger(viewModel::onHardDrop, strong = true) }
+                )
+
+                ActionRow(
+                    status = uiState.status,
+                    onNewGame = viewModel::onNewGameClicked,
+                    onPauseResume = viewModel::onPauseResumeClicked,
+                    onToggleSettings = viewModel::onSettingsPanelToggle,
+                    showSettings = uiState.showSettingsPanel
+                )
+
+                StatusCard(uiState = uiState)
+
+                if (uiState.showSettingsPanel) {
+                    SettingsPanel(
+                        draft = uiState.settingsDraft,
+                        onStartLevelChanged = viewModel::onStartLevelChanged,
+                        onVibrationChanged = viewModel::onVibrationChanged,
+                        onApply = viewModel::onApplySettings,
+                        onClose = viewModel::onSettingsPanelToggle
+                    )
+                }
+            })
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                TetrisBoard(
+                    board = uiState.board,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+
+                ControlPad(
+                    onLeft = { trigger(viewModel::onMoveLeft) },
+                    onRight = { trigger(viewModel::onMoveRight) },
+                    onRotate = { trigger(viewModel::onRotate) },
+                    onSoftDrop = { trigger(viewModel::onSoftDrop) },
+                    onHardDrop = { trigger(viewModel::onHardDrop, strong = true) }
+                )
+
+                ActionRow(
+                    status = uiState.status,
+                    onNewGame = viewModel::onNewGameClicked,
+                    onPauseResume = viewModel::onPauseResumeClicked,
+                    onToggleSettings = viewModel::onSettingsPanelToggle,
+                    showSettings = uiState.showSettingsPanel
+                )
+
+                StatusCard(uiState = uiState)
+
+                if (uiState.showSettingsPanel) {
+                    SettingsPanel(
+                        draft = uiState.settingsDraft,
+                        onStartLevelChanged = viewModel::onStartLevelChanged,
+                        onVibrationChanged = viewModel::onVibrationChanged,
+                        onApply = viewModel::onApplySettings,
+                        onClose = viewModel::onSettingsPanelToggle
+                    )
+                }
             }
         }
     }
@@ -141,6 +186,7 @@ private fun TetrisBoard(
             val rows = board.size
             val cols = board.first().size
 
+            // Preserve board geometry across devices: width / height = cols / rows.
             val ratio = if (cols > 0 && rows > 0) cols.toFloat() / rows.toFloat() else 0.5f
 
             Box(

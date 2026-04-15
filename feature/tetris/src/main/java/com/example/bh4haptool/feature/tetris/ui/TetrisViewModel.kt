@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+/** Coordinates Tetris UI state, persistence and game loop ticks. */
 @HiltViewModel
 class TetrisViewModel @Inject constructor(
     private val repository: ToolboxPreferencesRepository
@@ -193,6 +194,7 @@ class TetrisViewModel @Inject constructor(
             return
         }
 
+        // Tick interval is driven by engine snapshot and can change with level.
         tickJob = viewModelScope.launch {
             while (isActive) {
                 val interval = _uiState.value.dropIntervalMs.toLong().coerceAtLeast(80L)
@@ -216,6 +218,7 @@ class TetrisViewModel @Inject constructor(
     private fun mergeBoard(snapshot: TetrisSnapshot): List<List<Int>> {
         val merged = snapshot.settledBoard.map { row -> row.toMutableList() }
 
+        // Overlay active piece on top of settled cells for one render frame.
         for (cell in snapshot.activeCells) {
             if (cell.row in 0 until snapshot.height && cell.col in 0 until snapshot.width) {
                 merged[cell.row][cell.col] = cell.color

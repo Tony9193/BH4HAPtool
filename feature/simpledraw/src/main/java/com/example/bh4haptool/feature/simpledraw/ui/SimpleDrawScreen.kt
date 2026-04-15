@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.simpledraw.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,7 @@ fun SimpleDrawRoute(
     viewModel: SimpleDrawViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val paneMode = rememberToolPaneMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -49,63 +52,129 @@ fun SimpleDrawRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.simple_draw_description),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            OutlinedTextField(
-                value = uiState.candidatesInput,
-                onValueChange = viewModel::onCandidatesInputChanged,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(R.string.simple_draw_input_label)) },
-                placeholder = { Text(text = stringResource(R.string.simple_draw_input_placeholder)) },
-                minLines = 4
-            )
-            Text(
-                text = stringResource(R.string.simple_draw_count, uiState.parsedCount),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = viewModel::draw,
-                    modifier = Modifier.weight(1f)
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(text = stringResource(R.string.common_draw))
+                    Text(
+                        text = stringResource(R.string.simple_draw_description),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    OutlinedTextField(
+                        value = uiState.candidatesInput,
+                        onValueChange = viewModel::onCandidatesInputChanged,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(text = stringResource(R.string.simple_draw_input_label)) },
+                        placeholder = { Text(text = stringResource(R.string.simple_draw_input_placeholder)) },
+                        minLines = 8
+                    )
+                    uiState.winner?.let { winner ->
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = stringResource(R.string.simple_draw_result_label),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                                Text(
+                                    text = winner,
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                            }
+                        }
+                    }
                 }
-                OutlinedButton(
-                    onClick = viewModel::clear,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.common_clear))
-                }
-            }
-            uiState.message?.let { message ->
+            },
+                secondary = {
                 Text(
-                    text = message,
+                    text = stringResource(R.string.simple_draw_count, uiState.parsedCount),
                     style = MaterialTheme.typography.bodyMedium
                 )
-            }
-            uiState.winner?.let { winner ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(R.string.simple_draw_result_label),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                        Text(
-                            text = winner,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = viewModel::draw,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.common_draw))
+                    }
+                    OutlinedButton(
+                        onClick = viewModel::clear,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.common_clear))
+                    }
+                }
+                uiState.message?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            })
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.simple_draw_description),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                OutlinedTextField(
+                    value = uiState.candidatesInput,
+                    onValueChange = viewModel::onCandidatesInputChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = stringResource(R.string.simple_draw_input_label)) },
+                    placeholder = { Text(text = stringResource(R.string.simple_draw_input_placeholder)) },
+                    minLines = 4
+                )
+                Text(
+                    text = stringResource(R.string.simple_draw_count, uiState.parsedCount),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = viewModel::draw,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.common_draw))
+                    }
+                    OutlinedButton(
+                        onClick = viewModel::clear,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.common_clear))
+                    }
+                }
+                uiState.message?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                uiState.winner?.let { winner ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.simple_draw_result_label),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            Text(
+                                text = winner,
+                                style = MaterialTheme.typography.headlineMedium
+                            )
+                        }
                     }
                 }
             }

@@ -1,16 +1,18 @@
 <resources>
     <string name="shake_draw_back">返回</string>
     <string name="shake_draw_title">摇一摇抽签</string>
+    <string name="shake_draw_description">支持候选名单抽签和随机数字抽取，既可以手动触发，也可以直接摇一摇触发。</string>
+    <string name="shake_draw_mode_candidates">名单抽签</string>
+    <string name="shake_draw_mode_numbers">随机数字</string>
     <string name="shake_draw_input_label">候选名单</string>
     <string name="shake_draw_input_placeholder">示例：A, B, C</string>
-    <string name="shake_draw_count">有效候选人数：%1$d</string>
-    <string name="shake_draw_manual_button">手动抽签</string>
+    <string name="shake_draw_range_start">最小值</string>
+    <string name="shake_draw_range_end">最大值</string>
+    <string name="shake_draw_range_preview">当前范围：%1$s 到 %2$s</string>
+    <string name="shake_draw_count">有效候选项：%1$d</string>
+    <string name="shake_draw_manual_button">立即抽取</string>
     <string name="shake_draw_clear_button">清空</string>
-    <string name="shake_draw_result_label">抽中结果</string>
-
-    <string name="shake_draw_sensor_mode_label">当前传感器模式</string>
-    <string name="shake_draw_sensor_mode_gyroscope">陀螺仪（优先）</string>
-    <string name="shake_draw_sensor_mode_accelerometer">加速度计（自动降级）</string>
-    <string name="shake_draw_sensor_mode_unsupported">设备不支持摇一摇传感器</string>
-    <string name="shake_draw_cooldown">触发冷却：%1$d ms</string>
+    <string name="shake_draw_result_label">抽取结果</string>
+    <string name="shake_draw_shake_unavailable">当前设备不支持摇一摇触发，可继续使用手动抽取。</string>
+    <string name="shake_draw_cooldown">摇一摇冷却：%1$d ms</string>
 </resources>

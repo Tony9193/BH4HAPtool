@@ -31,6 +31,7 @@ data class MinesweeperBoardConfig(
     val mineCount: Int,
     val difficulty: MinesweeperDifficulty
 ) {
+    /** Clamps board parameters into safe runtime bounds. */
     fun sanitized(): MinesweeperBoardConfig {
         val safeWidth = width.coerceIn(MIN_WIDTH, MAX_WIDTH)
         val safeHeight = height.coerceIn(MIN_HEIGHT, MAX_HEIGHT)
@@ -90,6 +91,7 @@ data class MinesweeperSnapshot(
     val statusMessage: String
 )
 
+/** In-memory rules engine for Minesweeper with pause, marks and first-click safety. */
 class MinesweeperEngine(
     initialConfig: MinesweeperBoardConfig = MinesweeperBoardConfig.preset(MinesweeperDifficulty.NORMAL),
     private var firstClickSafe: Boolean = true,
@@ -170,6 +172,7 @@ class MinesweeperEngine(
         }
 
         if (!minesPlaced) {
+            // Generate mines lazily so first click can be guaranteed safe.
             val safeOrigin = if (firstClickSafe) CellCoord(row, col) else null
             placeMines(random = random, safeOrigin = safeOrigin)
             recalculateAdjacentMines()

@@ -4,14 +4,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,9 +41,12 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bh4haptool.core.toolkit.data.MinesweeperDifficulty
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.minesweeper.R
 import com.example.bh4haptool.feature.minesweeper.domain.CellMark
 import com.example.bh4haptool.feature.minesweeper.domain.MinesweeperBoardConfig
@@ -59,6 +61,7 @@ fun MinesweeperRoute(
     viewModel: MinesweeperViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val paneMode = rememberToolPaneMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -73,52 +76,96 @@ fun MinesweeperRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            BoardArea(
-                uiState = uiState,
-                onCellClick = viewModel::onCellClicked,
-                onCellLongPress = viewModel::onCellLongPressed,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
-
-            ActionRow(
-                uiState = uiState,
-                onNewGame = viewModel::onNewGameClicked,
-                onPauseResume = viewModel::onPauseResumeClicked,
-                onToggleSettings = viewModel::onSettingsPanelToggle
-            )
-
-            StatusCard(uiState = uiState)
-
-            Text(
-                text = stringResource(R.string.minesweeper_help),
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            if (uiState.showSettingsPanel) {
-                SettingsPanel(
-                    modifier = Modifier.weight(1f, fill = false),
-                    draft = uiState.settingsDraft,
-                    onDifficultyChanged = viewModel::onDifficultyChanged,
-                    onWidthChanged = viewModel::onDraftWidthChanged,
-                    onHeightChanged = viewModel::onDraftHeightChanged,
-                    onMineCountChanged = viewModel::onDraftMineCountChanged,
-                    onFirstClickSafeChanged = viewModel::onFirstClickSafeChanged,
-                    onQuestionMarkChanged = viewModel::onQuestionMarkChanged,
-                    onAutoExpandChanged = viewModel::onAutoExpandChanged,
-                    onSoundChanged = viewModel::onSoundChanged,
-                    onVibrationChanged = viewModel::onVibrationChanged,
-                    onApply = viewModel::onApplySettings,
-                    onClose = viewModel::onSettingsPanelToggle
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                BoardArea(
+                    uiState = uiState,
+                    onCellClick = viewModel::onCellClicked,
+                    onCellLongPress = viewModel::onCellLongPressed,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
+            },
+                secondary = {
+                ActionRow(
+                    uiState = uiState,
+                    onNewGame = viewModel::onNewGameClicked,
+                    onPauseResume = viewModel::onPauseResumeClicked,
+                    onToggleSettings = viewModel::onSettingsPanelToggle
+                )
+                StatusCard(uiState = uiState)
+                Text(
+                    text = stringResource(R.string.minesweeper_help),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                if (uiState.showSettingsPanel) {
+                    SettingsPanel(
+                        draft = uiState.settingsDraft,
+                        onDifficultyChanged = viewModel::onDifficultyChanged,
+                        onWidthChanged = viewModel::onDraftWidthChanged,
+                        onHeightChanged = viewModel::onDraftHeightChanged,
+                        onMineCountChanged = viewModel::onDraftMineCountChanged,
+                        onFirstClickSafeChanged = viewModel::onFirstClickSafeChanged,
+                        onQuestionMarkChanged = viewModel::onQuestionMarkChanged,
+                        onAutoExpandChanged = viewModel::onAutoExpandChanged,
+                        onSoundChanged = viewModel::onSoundChanged,
+                        onVibrationChanged = viewModel::onVibrationChanged,
+                        onApply = viewModel::onApplySettings,
+                        onClose = viewModel::onSettingsPanelToggle
+                    )
+                }
+            })
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                BoardArea(
+                    uiState = uiState,
+                    onCellClick = viewModel::onCellClicked,
+                    onCellLongPress = viewModel::onCellLongPressed,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+
+                ActionRow(
+                    uiState = uiState,
+                    onNewGame = viewModel::onNewGameClicked,
+                    onPauseResume = viewModel::onPauseResumeClicked,
+                    onToggleSettings = viewModel::onSettingsPanelToggle
+                )
+
+                StatusCard(uiState = uiState)
+
+                Text(
+                    text = stringResource(R.string.minesweeper_help),
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                if (uiState.showSettingsPanel) {
+                    SettingsPanel(
+                        modifier = Modifier.weight(1f, fill = false),
+                        draft = uiState.settingsDraft,
+                        onDifficultyChanged = viewModel::onDifficultyChanged,
+                        onWidthChanged = viewModel::onDraftWidthChanged,
+                        onHeightChanged = viewModel::onDraftHeightChanged,
+                        onMineCountChanged = viewModel::onDraftMineCountChanged,
+                        onFirstClickSafeChanged = viewModel::onFirstClickSafeChanged,
+                        onQuestionMarkChanged = viewModel::onQuestionMarkChanged,
+                        onAutoExpandChanged = viewModel::onAutoExpandChanged,
+                        onSoundChanged = viewModel::onSoundChanged,
+                        onVibrationChanged = viewModel::onVibrationChanged,
+                        onApply = viewModel::onApplySettings,
+                        onClose = viewModel::onSettingsPanelToggle
+                    )
+                }
             }
         }
     }
@@ -429,19 +476,9 @@ private fun BoardArea(
     val colorScheme = MaterialTheme.colorScheme
     val haptic = LocalHapticFeedback.current
 
-    val longestSide = maxOf(uiState.boardConfig.width, uiState.boardConfig.height)
-    val cellSize = when {
-        longestSide <= 10 -> 34.dp
-        longestSide <= 14 -> 30.dp
-        longestSide <= 18 -> 26.dp
-        else -> 22.dp
-    }
-
     val canInteract = !uiState.isLoading && uiState.status != MinesweeperStatus.PAUSED
 
-    Card(
-        modifier = modifier.heightIn(min = 280.dp)
-    ) {
+    Card(modifier = modifier) {
         if (board.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -452,40 +489,51 @@ private fun BoardArea(
                 Text(text = "加载中…")
             }
         } else {
-            val horizontalScroll = rememberScrollState()
-            val verticalScroll = rememberScrollState()
-
-            Column(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colorScheme.surfaceVariant)
                     .padding(8.dp)
-                    .horizontalScroll(horizontalScroll)
-                    .verticalScroll(verticalScroll),
-                verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-                board.forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
-                        row.forEach { cell ->
-                            CellTile(
-                                cell = cell,
-                                exploded = uiState.explodedCell?.row == cell.row &&
-                                    uiState.explodedCell.col == cell.col,
-                                canInteract = canInteract,
-                                cellSize = cellSize,
-                                onClick = {
-                                    if (uiState.settingsDraft.vibrationEnabled) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                val rows = board.size.coerceAtLeast(1)
+                val cols = board.firstOrNull()?.size?.coerceAtLeast(1) ?: 1
+                val cellSpacing = 1.dp
+                val preferredCellSize = preferredCellSize(
+                    width = uiState.boardConfig.width,
+                    height = uiState.boardConfig.height
+                )
+                val fittedCellWidth = ((maxWidth - cellSpacing * (cols - 1)) / cols).coerceAtLeast(0.dp)
+                val fittedCellHeight = ((maxHeight - cellSpacing * (rows - 1)) / rows).coerceAtLeast(0.dp)
+                val cellSize = minOf(preferredCellSize, fittedCellWidth, fittedCellHeight)
+                    .coerceAtLeast(1.dp)
+
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    verticalArrangement = Arrangement.spacedBy(cellSpacing)
+                ) {
+                    board.forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(cellSpacing)) {
+                            row.forEach { cell ->
+                                CellTile(
+                                    cell = cell,
+                                    exploded = uiState.explodedCell?.row == cell.row &&
+                                        uiState.explodedCell.col == cell.col,
+                                    canInteract = canInteract,
+                                    cellSize = cellSize,
+                                    onClick = {
+                                        if (uiState.settingsDraft.vibrationEnabled) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        }
+                                        onCellClick(cell.row, cell.col)
+                                    },
+                                    onLongClick = {
+                                        if (uiState.settingsDraft.vibrationEnabled) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        }
+                                        onCellLongPress(cell.row, cell.col)
                                     }
-                                    onCellClick(cell.row, cell.col)
-                                },
-                                onLongClick = {
-                                    if (uiState.settingsDraft.vibrationEnabled) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    }
-                                    onCellLongPress(cell.row, cell.col)
-                                }
-                            )
+                                )
+                            }
                         }
                     }
                 }
@@ -551,10 +599,27 @@ private fun CellTile(
             Text(
                 text = content,
                 color = contentColor,
-                style = MaterialTheme.typography.bodyMedium,
+                style = if (cellSize < 18.dp) {
+                    MaterialTheme.typography.bodySmall
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                },
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+}
+
+private fun preferredCellSize(
+    width: Int,
+    height: Int
+): Dp {
+    val longestSide = maxOf(width, height)
+    return when {
+        longestSide <= 10 -> 34.dp
+        longestSide <= 14 -> 30.dp
+        longestSide <= 18 -> 26.dp
+        else -> 22.dp
     }
 }
 

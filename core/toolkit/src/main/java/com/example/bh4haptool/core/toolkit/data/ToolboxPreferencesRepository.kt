@@ -17,6 +17,9 @@ import javax.inject.Singleton
 
 private val Context.toolboxDataStore: DataStore<Preferences> by preferencesDataStore(name = "toolbox_settings")
 
+/**
+ * Central persistence gateway for all toolbox feature settings and statistics.
+ */
 @Singleton
 class ToolboxPreferencesRepository @Inject constructor(
     @param:ApplicationContext private val context: Context
@@ -263,6 +266,7 @@ class ToolboxPreferencesRepository @Inject constructor(
             return emptyMap()
         }
 
+        // Encoded format: level:moves,level:moves
         return encoded
             .split(',')
             .mapNotNull { token ->
@@ -279,6 +283,7 @@ class ToolboxPreferencesRepository @Inject constructor(
     }
 
     private fun encodeBestMoves(values: Map<Int, Int>): String {
+        // Keep encoded data stable for diff-friendly storage.
         return values
             .toSortedMap()
             .entries

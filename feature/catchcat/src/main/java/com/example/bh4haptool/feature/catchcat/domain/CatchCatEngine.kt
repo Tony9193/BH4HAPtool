@@ -34,6 +34,10 @@ fun interface CatchCatSolver {
     ): Int
 }
 
+/**
+ * Chooses cat movement by shortest-path distance to edge,
+ * and breaks ties by preferring branches with more escape routes.
+ */
 class NearestPathSolver : CatchCatSolver {
     override fun nextDirection(
         width: Int,
@@ -83,6 +87,7 @@ class NearestPathSolver : CatchCatSolver {
 
         val catDistance = distance[cat.i][cat.j]
         if (catDistance >= INF) {
+            // No path to any border cell means player already trapped the cat.
             return -1
         }
 
@@ -158,6 +163,10 @@ class NearestPathSolver : CatchCatSolver {
     }
 }
 
+/**
+ * In-memory engine for the "Catch the Cat" game.
+ * Tracks wall placement history so undo can restore both wall and cat position.
+ */
 class CatchCatEngine(
     val width: Int = DEFAULT_WIDTH,
     val height: Int = DEFAULT_HEIGHT,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -17,6 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -31,8 +35,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.shakedraw.R
 import com.example.bh4haptool.feature.shakedraw.sensor.ActiveSensorMode
 import com.example.bh4haptool.feature.shakedraw.sensor.ShakeDetector
@@ -46,6 +54,7 @@ fun ShakeDrawRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val paneMode = rememberToolPaneMode()
     val sensorManager = remember {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
@@ -54,7 +63,9 @@ fun ShakeDrawRoute(
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         viewModel.onShakeTriggered()
     })
-    val onModeChanged by rememberUpdatedState(newValue = viewModel::onSensorModeChanged)
+    val onModeChanged by rememberUpdatedState(newValue = { mode: ActiveSensorMode ->
+        viewModel.onShakeAvailabilityChanged(mode != ActiveSensorMode.UNSUPPORTED)
+    })
 
     val shakeDetector = remember(
         sensorManager,
@@ -92,80 +103,138 @@ fun ShakeDrawRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.shake_draw_sensor_mode_label),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Text(
-                        text = sensorModeLabel(uiState.sensorMode),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                MainPanel(
+                    uiState = uiState,
+                    onModeChanged = viewModel::onModeChanged,
+                    onCandidatesInputChanged = viewModel::onCandidatesInputChanged,
+                    onRangeStartChanged = viewModel::onRangeStartChanged,
+                    onRangeEndChanged = viewModel::onRangeEndChanged,
+                    expandedInput = true
+                )
+            },
+                secondary = {
+                ControlPanel(
+                    uiState = uiState,
+                    onManualDraw = viewModel::manualDraw,
+                    onClear = viewModel::clear
+                )
+            })
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                MainPanel(
+                    uiState = uiState,
+                    onModeChanged = viewModel::onModeChanged,
+                    onCandidatesInputChanged = viewModel::onCandidatesInputChanged,
+                    onRangeStartChanged = viewModel::onRangeStartChanged,
+                    onRangeEndChanged = viewModel::onRangeEndChanged,
+                    expandedInput = false
+                )
+                ControlPanel(
+                    uiState = uiState,
+                    onManualDraw = viewModel::manualDraw,
+                    onClear = viewModel::clear
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainPanel(
+    uiState: ShakeDrawUiState,
+    onModeChanged: (ShakeDrawMode) -> Unit,
+    onCandidatesInputChanged: (String) -> Unit,
+    onRangeStartChanged: (String) -> Unit,
+    onRangeEndChanged: (String) -> Unit,
+    expandedInput: Boolean
+) {
+    val modes = listOf(ShakeDrawMode.CANDIDATES, ShakeDrawMode.RANDOM_NUMBER)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = stringResource(R.string.shake_draw_description),
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            modes.forEachIndexed { index, mode ->
+                SegmentedButton(
+                    selected = uiState.mode == mode,
+                    onClick = { onModeChanged(mode) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size)
+                ) {
                     Text(
                         text = stringResource(
-                            R.string.shake_draw_cooldown,
-                            uiState.cooldownMs
-                        ),
-                        style = MaterialTheme.typography.bodySmall
+                            if (mode == ShakeDrawMode.CANDIDATES) {
+                                R.string.shake_draw_mode_candidates
+                            } else {
+                                R.string.shake_draw_mode_numbers
+                            }
+                        )
                     )
                 }
             }
+        }
 
+        if (uiState.mode == ShakeDrawMode.CANDIDATES) {
             OutlinedTextField(
                 value = uiState.candidatesInput,
-                onValueChange = viewModel::onCandidatesInputChanged,
+                onValueChange = onCandidatesInputChanged,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = stringResource(R.string.shake_draw_input_label)) },
                 placeholder = { Text(text = stringResource(R.string.shake_draw_input_placeholder)) },
-                minLines = 4
+                minLines = if (expandedInput) 8 else 4
             )
-            Text(
-                text = stringResource(R.string.shake_draw_count, uiState.parsedCount),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
-                    onClick = viewModel::manualDraw,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.shake_draw_manual_button))
-                }
-                OutlinedButton(
-                    onClick = viewModel::clear,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.shake_draw_clear_button))
-                }
-            }
-            uiState.message?.let { message ->
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyMedium
+                OutlinedTextField(
+                    value = uiState.rangeStartInput,
+                    onValueChange = onRangeStartChanged,
+                    modifier = Modifier.weight(1f),
+                    label = { Text(text = stringResource(R.string.shake_draw_range_start)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = uiState.rangeEndInput,
+                    onValueChange = onRangeEndChanged,
+                    modifier = Modifier.weight(1f),
+                    label = { Text(text = stringResource(R.string.shake_draw_range_end)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
                 )
             }
-            uiState.winner?.let { winner ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(R.string.shake_draw_result_label),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                        Text(
-                            text = winner,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                    }
+        }
+
+        uiState.winner?.let { winner ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.shake_draw_result_label),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        text = winner,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -173,10 +242,60 @@ fun ShakeDrawRoute(
 }
 
 @Composable
-private fun sensorModeLabel(mode: ActiveSensorMode): String {
-    return when (mode) {
-        ActiveSensorMode.ACCELEROMETER -> stringResource(R.string.shake_draw_sensor_mode_accelerometer)
-        ActiveSensorMode.GYROSCOPE_FALLBACK -> stringResource(R.string.shake_draw_sensor_mode_gyroscope)
-        ActiveSensorMode.UNSUPPORTED -> stringResource(R.string.shake_draw_sensor_mode_unsupported)
+private fun ControlPanel(
+    uiState: ShakeDrawUiState,
+    onManualDraw: () -> Unit,
+    onClear: () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = if (uiState.mode == ShakeDrawMode.CANDIDATES) {
+                stringResource(R.string.shake_draw_count, uiState.parsedCount)
+            } else {
+                stringResource(
+                    R.string.shake_draw_range_preview,
+                    uiState.rangeStartInput.ifBlank { "-" },
+                    uiState.rangeEndInput.ifBlank { "-" }
+                )
+            },
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Button(
+                onClick = onManualDraw,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(R.string.shake_draw_manual_button))
+            }
+            OutlinedButton(
+                onClick = onClear,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(R.string.shake_draw_clear_button))
+            }
+        }
+
+        Text(
+            text = stringResource(R.string.shake_draw_cooldown, uiState.cooldownMs),
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        if (!uiState.isShakeSupported) {
+            Text(
+                text = stringResource(R.string.shake_draw_shake_unavailable),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
+        uiState.message?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }

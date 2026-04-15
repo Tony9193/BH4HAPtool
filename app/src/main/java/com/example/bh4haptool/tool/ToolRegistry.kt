@@ -6,17 +6,10 @@ import com.example.bh4haptool.feature.frisbeegroup.navigation.FrisbeeGroupDestin
 import com.example.bh4haptool.feature.minesweeper.navigation.MinesweeperDestination
 import com.example.bh4haptool.feature.sokoban.navigation.SokobanDestination
 import com.example.bh4haptool.feature.shakedraw.navigation.ShakeDrawDestination
-import com.example.bh4haptool.feature.simpledraw.navigation.SimpleDrawDestination
 import com.example.bh4haptool.feature.tetris.navigation.TetrisDestination
 
 object ToolRegistry {
     val entries: List<ToolEntry> = listOf(
-        ToolEntry(
-            id = "simple_draw",
-            titleRes = R.string.tool_simple_draw_title,
-            descriptionRes = R.string.tool_simple_draw_description,
-            route = SimpleDrawDestination.route
-        ),
         ToolEntry(
             id = "shake_draw",
             titleRes = R.string.tool_shake_draw_title,

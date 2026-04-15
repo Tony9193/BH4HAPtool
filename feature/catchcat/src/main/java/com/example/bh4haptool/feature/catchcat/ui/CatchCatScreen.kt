@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.catchcat.R
 import com.example.bh4haptool.feature.catchcat.domain.CatchCatStatus
 import com.example.bh4haptool.feature.catchcat.domain.HexCoord
@@ -56,6 +58,7 @@ fun CatchCatRoute(
     viewModel: CatchCatViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val paneMode = rememberToolPaneMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -70,82 +73,161 @@ fun CatchCatRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            CatchCatBoard(
-                uiState = uiState,
-                onCellTapped = { coord ->
-                    viewModel.onCellTapped(coord.i, coord.j)
-                },
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                CatchCatBoard(
+                    uiState = uiState,
+                    onCellTapped = { coord ->
+                        viewModel.onCellTapped(coord.i, coord.j)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            },
+                secondary = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = viewModel::onResetClicked,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.catch_cat_reset))
+                    }
+                    OutlinedButton(
+                        onClick = viewModel::onUndoClicked,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.catch_cat_undo))
+                    }
+                }
+
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.catch_cat_status_label),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Text(
+                            text = statusText(uiState.status),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_moves, uiState.moveCount),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.catch_cat_initial_walls,
+                                uiState.initialWallCount
+                            ),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_message_label),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Text(
+                            text = uiState.statusMessage,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_description),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_help),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            })
+        } else {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .sizeIn(minHeight = 260.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
-                    onClick = viewModel::onResetClicked,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.catch_cat_reset))
-                }
-                OutlinedButton(
-                    onClick = viewModel::onUndoClicked,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.catch_cat_undo))
-                }
-            }
+                CatchCatBoard(
+                    uiState = uiState,
+                    onCellTapped = { coord ->
+                        viewModel.onCellTapped(coord.i, coord.j)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .sizeIn(minHeight = 260.dp)
+                )
 
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.catch_cat_status_label),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Text(
-                        text = statusText(uiState.status),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = stringResource(R.string.catch_cat_moves, uiState.moveCount),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.catch_cat_initial_walls,
-                            uiState.initialWallCount
-                        ),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = stringResource(R.string.catch_cat_message_label),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Text(
-                        text = uiState.statusMessage,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.catch_cat_description),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = stringResource(R.string.catch_cat_help),
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Button(
+                        onClick = viewModel::onResetClicked,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.catch_cat_reset))
+                    }
+                    OutlinedButton(
+                        onClick = viewModel::onUndoClicked,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.catch_cat_undo))
+                    }
+                }
+
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.catch_cat_status_label),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Text(
+                            text = statusText(uiState.status),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_moves, uiState.moveCount),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.catch_cat_initial_walls,
+                                uiState.initialWallCount
+                            ),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_message_label),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Text(
+                            text = uiState.statusMessage,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_description),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = stringResource(R.string.catch_cat_help),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }

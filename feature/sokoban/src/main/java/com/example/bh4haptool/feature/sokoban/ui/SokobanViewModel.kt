@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/** Bridges Sokoban engine snapshots to Compose UI state and persistence. */
 @HiltViewModel
 class SokobanViewModel @Inject constructor(
     private val repository: ToolboxPreferencesRepository
@@ -150,6 +151,7 @@ class SokobanViewModel @Inject constructor(
 
         viewModelScope.launch {
             repository.incrementSokobanCompletedLevels()
+            // Only update storage when the new score actually improves best moves.
             if (shouldUpdateBest) {
                 repository.updateSokobanBestMoves(levelIndex, moves)
             }
@@ -167,6 +169,7 @@ class SokobanViewModel @Inject constructor(
         completedLevelsOverride: Int? = null,
         vibrationOverride: Boolean? = null
     ) {
+        // UI state is always rebuilt from engine snapshot to keep one source of truth.
         val completed = completedLevelsOverride ?: _uiState.value.completedLevels
         val vibration = vibrationOverride ?: _uiState.value.vibrationEnabled
         val best = bestMovesByLevel[snapshot.levelIndex] ?: 0

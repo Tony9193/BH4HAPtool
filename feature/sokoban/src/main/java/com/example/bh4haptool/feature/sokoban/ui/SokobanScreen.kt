@@ -5,14 +5,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,8 +47,11 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.sokoban.R
 import com.example.bh4haptool.feature.sokoban.domain.MoveDirection
 import com.example.bh4haptool.feature.sokoban.domain.SokobanCoord
@@ -63,6 +67,8 @@ fun SokobanRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = LocalHapticFeedback.current
+    val paneMode = rememberToolPaneMode()
+    var showLevelSelect by remember { mutableStateOf(false) }
 
     fun triggerMove(direction: MoveDirection) {
         val moved = viewModel.onMove(direction)
@@ -84,86 +90,151 @@ fun SokobanRoute(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(12.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SokobanBoard(
-                uiState = uiState,
-                onBoardTapped = { row, col ->
-                    val dRow = row - uiState.player.row
-                    val dCol = col - uiState.player.col
+        if (paneMode.isTabletMode) {
+            TabletTwoPane(
+                contentPadding = innerPadding,
+                primary = {
+                SokobanBoard(
+                    uiState = uiState,
+                    onBoardTapped = { row, col ->
+                        val dRow = row - uiState.player.row
+                        val dCol = col - uiState.player.col
 
-                    val direction = when {
-                        abs(dRow) >= abs(dCol) && dRow != 0 -> {
-                            if (dRow < 0) MoveDirection.UP else MoveDirection.DOWN
+                        val direction = when {
+                            abs(dRow) >= abs(dCol) && dRow != 0 -> {
+                                if (dRow < 0) MoveDirection.UP else MoveDirection.DOWN
+                            }
+
+                            dCol != 0 -> {
+                                if (dCol < 0) MoveDirection.LEFT else MoveDirection.RIGHT
+                            }
+
+                            else -> null
                         }
 
-                        dCol != 0 -> {
-                            if (dCol < 0) MoveDirection.LEFT else MoveDirection.RIGHT
+                        if (direction != null) {
+                            triggerMove(direction)
                         }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            },
+                secondary = {
+                DirectionPad(
+                    onUp = { triggerMove(MoveDirection.UP) },
+                    onDown = { triggerMove(MoveDirection.DOWN) },
+                    onLeft = { triggerMove(MoveDirection.LEFT) },
+                    onRight = { triggerMove(MoveDirection.RIGHT) }
+                )
 
-                        else -> null
-                    }
+                UtilityRow(
+                    onUndo = viewModel::onUndo,
+                    onReset = viewModel::onReset,
+                    onPrev = viewModel::onPreviousLevel,
+                    onNext = viewModel::onNextLevel
+                )
 
-                    if (direction != null) {
-                        triggerMove(direction)
-                    }
-                },
+                ExtraUtilityRow(
+                    onPickLevel = { showLevelSelect = true },
+                    onRandomLevel = viewModel::onRandomLevel
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = stringResource(R.string.sokoban_vibration))
+                    Switch(
+                        checked = uiState.vibrationEnabled,
+                        onCheckedChange = viewModel::onVibrationChanged
+                    )
+                }
+
+                StatusCard(uiState = uiState)
+            })
+        } else {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .sizeIn(minHeight = 260.dp)
-            )
-
-            DirectionPad(
-                onUp = { triggerMove(MoveDirection.UP) },
-                onDown = { triggerMove(MoveDirection.DOWN) },
-                onLeft = { triggerMove(MoveDirection.LEFT) },
-                onRight = { triggerMove(MoveDirection.RIGHT) }
-            )
-
-            var showLevelSelect by remember { mutableStateOf(false) }
-
-            if (showLevelSelect) {
-                LevelSelectionDialog(
-                    currentLevel = uiState.levelIndex + 1,
-                    totalLevels = uiState.totalLevels,
-                    onDismiss = { showLevelSelect = false },
-                    onConfirm = { levelTarget ->
-                        showLevelSelect = false
-                        viewModel.onJumpToLevel(levelTarget - 1)
-                    }
-                )
-            }
-
-            UtilityRow(
-                onUndo = viewModel::onUndo,
-                onReset = viewModel::onReset,
-                onPrev = viewModel::onPreviousLevel,
-                onNext = viewModel::onNextLevel
-            )
-
-            ExtraUtilityRow(
-                onPickLevel = { showLevelSelect = true },
-                onRandomLevel = viewModel::onRandomLevel
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(innerPadding)
+                    .padding(12.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text(text = stringResource(R.string.sokoban_vibration))
-                Switch(
-                    checked = uiState.vibrationEnabled,
-                    onCheckedChange = viewModel::onVibrationChanged
-                )
-            }
+                SokobanBoard(
+                    uiState = uiState,
+                    onBoardTapped = { row, col ->
+                        val dRow = row - uiState.player.row
+                        val dCol = col - uiState.player.col
 
-            StatusCard(uiState = uiState)
+                        val direction = when {
+                            abs(dRow) >= abs(dCol) && dRow != 0 -> {
+                                if (dRow < 0) MoveDirection.UP else MoveDirection.DOWN
+                            }
+
+                            dCol != 0 -> {
+                                if (dCol < 0) MoveDirection.LEFT else MoveDirection.RIGHT
+                            }
+
+                            else -> null
+                        }
+
+                        if (direction != null) {
+                            triggerMove(direction)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 220.dp, max = 420.dp)
+                )
+
+                DirectionPad(
+                    onUp = { triggerMove(MoveDirection.UP) },
+                    onDown = { triggerMove(MoveDirection.DOWN) },
+                    onLeft = { triggerMove(MoveDirection.LEFT) },
+                    onRight = { triggerMove(MoveDirection.RIGHT) }
+                )
+
+                UtilityRow(
+                    onUndo = viewModel::onUndo,
+                    onReset = viewModel::onReset,
+                    onPrev = viewModel::onPreviousLevel,
+                    onNext = viewModel::onNextLevel
+                )
+
+                ExtraUtilityRow(
+                    onPickLevel = { showLevelSelect = true },
+                    onRandomLevel = viewModel::onRandomLevel
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = stringResource(R.string.sokoban_vibration))
+                    Switch(
+                        checked = uiState.vibrationEnabled,
+                        onCheckedChange = viewModel::onVibrationChanged
+                    )
+                }
+
+                StatusCard(uiState = uiState)
+            }
+        }
+
+        if (showLevelSelect) {
+            LevelSelectionDialog(
+                currentLevel = uiState.levelIndex + 1,
+                totalLevels = uiState.totalLevels,
+                onDismiss = { showLevelSelect = false },
+                onConfirm = { levelTarget ->
+                    showLevelSelect = false
+                    viewModel.onJumpToLevel(levelTarget - 1)
+                }
+            )
         }
     }
 }
@@ -174,9 +245,7 @@ private fun SokobanBoard(
     onBoardTapped: (row: Int, col: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.heightIn(min = 280.dp)
-    ) {
+    Card(modifier = modifier) {
         if (uiState.boardWidth <= 0 || uiState.boardHeight <= 0) {
             Box(
                 modifier = Modifier
@@ -187,20 +256,33 @@ private fun SokobanBoard(
                 Text(text = "加载中…")
             }
         } else {
-            val ratio = if (uiState.boardWidth > 0 && uiState.boardHeight > 0) {
-                uiState.boardWidth.toFloat() / uiState.boardHeight.toFloat()
-            } else 1f
-
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(8.dp)
             ) {
+                val boardRatio = uiState.boardWidth.toFloat() / uiState.boardHeight.toFloat()
+                val containerRatio = if (maxHeight > 0.dp) {
+                    maxWidth / maxHeight
+                } else {
+                    boardRatio
+                }
+                val canvasWidth: Dp
+                val canvasHeight: Dp
+
+                if (boardRatio >= containerRatio) {
+                    canvasWidth = maxWidth
+                    canvasHeight = maxWidth / boardRatio
+                } else {
+                    canvasHeight = maxHeight
+                    canvasWidth = maxHeight * boardRatio
+                }
+
                 Canvas(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(ratio)
+                        .align(Alignment.Center)
+                        .width(canvasWidth)
+                        .height(canvasHeight)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .pointerInput(uiState.boardWidth, uiState.boardHeight, uiState.player) {
                             detectTapGestures { tap ->
@@ -216,62 +298,62 @@ private fun SokobanBoard(
                             }
                         }
                 ) {
-                val cellWidth = size.width / uiState.boardWidth
-                val cellHeight = size.height / uiState.boardHeight
+                    val cellWidth = size.width / uiState.boardWidth
+                    val cellHeight = size.height / uiState.boardHeight
 
-                for (row in 0 until uiState.boardHeight) {
-                    for (col in 0 until uiState.boardWidth) {
-                        val coord = SokobanCoord(row, col)
-                        val topLeft = Offset(col * cellWidth, row * cellHeight)
-                        val cellSize = Size(cellWidth - 1f, cellHeight - 1f)
+                    for (row in 0 until uiState.boardHeight) {
+                        for (col in 0 until uiState.boardWidth) {
+                            val coord = SokobanCoord(row, col)
+                            val topLeft = Offset(col * cellWidth, row * cellHeight)
+                            val cellSize = Size(cellWidth - 1f, cellHeight - 1f)
 
-                        drawRect(
-                            color = Color(0xFFF2EFE9),
-                            topLeft = topLeft,
-                            size = cellSize
-                        )
-
-                        if (coord in uiState.walls) {
                             drawRect(
-                                color = Color(0xFF5D6D7E),
+                                color = Color(0xFFF2EFE9),
                                 topLeft = topLeft,
                                 size = cellSize
                             )
-                            continue
-                        }
 
-                        if (coord in uiState.targets) {
-                            drawCircle(
-                                color = Color(0xFFE57373),
-                                radius = minOf(cellWidth, cellHeight) * 0.16f,
-                                center = Offset(
-                                    x = topLeft.x + cellWidth / 2f,
-                                    y = topLeft.y + cellHeight / 2f
+                            if (coord in uiState.walls) {
+                                drawRect(
+                                    color = Color(0xFF5D6D7E),
+                                    topLeft = topLeft,
+                                    size = cellSize
                                 )
-                            )
-                        }
+                                continue
+                            }
 
-                        if (coord in uiState.boxes) {
-                            drawRect(
-                                color = Color(0xFFB07B3F),
-                                topLeft = Offset(topLeft.x + cellWidth * 0.14f, topLeft.y + cellHeight * 0.14f),
-                                size = Size(cellWidth * 0.72f, cellHeight * 0.72f)
-                            )
-                        }
-
-                        if (coord == uiState.player) {
-                            drawCircle(
-                                color = Color(0xFF3F51B5),
-                                radius = minOf(cellWidth, cellHeight) * 0.26f,
-                                center = Offset(
-                                    x = topLeft.x + cellWidth / 2f,
-                                    y = topLeft.y + cellHeight / 2f
+                            if (coord in uiState.targets) {
+                                drawCircle(
+                                    color = Color(0xFFE57373),
+                                    radius = minOf(cellWidth, cellHeight) * 0.16f,
+                                    center = Offset(
+                                        x = topLeft.x + cellWidth / 2f,
+                                        y = topLeft.y + cellHeight / 2f
+                                    )
                                 )
-                            )
+                            }
+
+                            if (coord in uiState.boxes) {
+                                drawRect(
+                                    color = Color(0xFFB07B3F),
+                                    topLeft = Offset(topLeft.x + cellWidth * 0.14f, topLeft.y + cellHeight * 0.14f),
+                                    size = Size(cellWidth * 0.72f, cellHeight * 0.72f)
+                                )
+                            }
+
+                            if (coord == uiState.player) {
+                                drawCircle(
+                                    color = Color(0xFF3F51B5),
+                                    radius = minOf(cellWidth, cellHeight) * 0.26f,
+                                    center = Offset(
+                                        x = topLeft.x + cellWidth / 2f,
+                                        y = topLeft.y + cellHeight / 2f
+                                    )
+                                )
+                            }
                         }
                     }
                 }
-            }
             }
         }
     }
@@ -431,6 +513,10 @@ private fun StatusCard(uiState: SokobanUiState) {
                         uiState.currentLevelBestMoves.toString()
                     }
                 )
+            )
+            Text(
+                text = stringResource(R.string.sokoban_help),
+                style = MaterialTheme.typography.bodySmall
             )
             Text(
                 text = uiState.statusMessage,

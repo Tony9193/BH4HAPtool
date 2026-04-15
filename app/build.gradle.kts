@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.bh4haptool"
         minSdk = 31
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1build2"
+        versionCode = 4
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,6 @@ android {
 
 dependencies {
     implementation(project(":core:toolkit"))
-    implementation(project(":feature:simpledraw"))
     implementation(project(":feature:shakedraw"))
     implementation(project(":feature:catchcat"))
     implementation(project(":feature:frisbeegroup"))

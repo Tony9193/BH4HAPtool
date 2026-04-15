@@ -51,6 +51,9 @@ private data class ParsedLevel(
     val player: SokobanCoord
 )
 
+/**
+ * Pure Sokoban rule engine with level loading, movement, push rules and undo.
+ */
 class SokobanEngine(
     private val levels: List<SokobanLevel> = SokobanLevels.DEFAULT_LEVELS
 ) {
@@ -238,6 +241,7 @@ class SokobanEngine(
                 val symbol = level.rows[row].getOrElse(col) { ' ' }
                 val coord = SokobanCoord(row = row, col = col)
 
+                // Sokoban symbols: # wall, . target, $ box, * box on target, @ player, + player on target.
                 when (symbol) {
                     '#' -> parsedWalls.add(coord)
                     '.' -> parsedTargets.add(coord)

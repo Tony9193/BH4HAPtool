@@ -1,5 +1,9 @@
 package com.example.bh4haptool.core.toolkit.draw
 
+/**
+ * Parses user input into a de-duplicated candidate list.
+ * Supports both English and Chinese separators.
+ */
 object CandidateParser {
     private val separators = Regex("[,，;；\\n\\r\\t]+")
 

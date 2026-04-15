@@ -23,4 +23,5 @@
     <string name="sokoban_completed">累计通关：%1$d</string>
     <string name="sokoban_best_moves">本关最佳：%1$s</string>
     <string name="sokoban_no_best">--</string>
+    <string name="sokoban_help">介绍：把所有箱子推进目标点即可过关，支持撤销、重开、选关和随机关卡。</string>
 </resources>

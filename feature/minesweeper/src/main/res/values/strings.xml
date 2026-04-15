@@ -45,6 +45,6 @@
     <string name="minesweeper_apply_settings">应用并重开</string>
     <string name="minesweeper_close_settings">关闭</string>
 
-    <string name="minesweeper_help">操作：单击开格，长按插旗/问号；点已翻开的数字格可尝试快速展开周围。</string>
+    <string name="minesweeper_help">介绍：支持经典扫雷规则和自定义盘面。单击开格，长按插旗或问号；点击已翻开的数字格可尝试快速展开周围区域。</string>
     <string name="minesweeper_no_best">--</string>
 </resources>

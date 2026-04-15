@@ -25,7 +25,6 @@ dependencyResolutionManagement {
 rootProject.name = "BH4HAPtool"
 include(":app")
 include(":core:toolkit")
-include(":feature:simpledraw")
 include(":feature:shakedraw")
 include(":feature:catchcat")
 include(":feature:frisbeegroup")

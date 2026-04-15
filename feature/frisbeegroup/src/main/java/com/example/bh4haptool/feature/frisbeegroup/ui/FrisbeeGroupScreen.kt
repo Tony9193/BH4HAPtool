@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,6 +58,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bh4haptool.core.toolkit.ui.TabletTwoPane
+import com.example.bh4haptool.core.toolkit.ui.rememberToolPaneMode
 import com.example.bh4haptool.feature.frisbeegroup.R
 import com.example.bh4haptool.feature.frisbeegroup.domain.FrisbeeGroupingEngine
 import com.example.bh4haptool.feature.frisbeegroup.domain.FrisbeePalette
@@ -204,6 +207,7 @@ private fun SetupContent(
     onStartDraw: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val paneMode = rememberToolPaneMode()
     val teamHint = FrisbeeGroupingEngine.teamSizeHint(
         totalPlayers = if (uiState.inputMode == PlayerInputMode.NAMES) {
             maxOf(2, FrisbeeGroupingEngine.parseNames(uiState.namesInput).size)
@@ -215,107 +219,212 @@ private fun SetupContent(
 
     val paletteLabels = paletteLabels()
 
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.frisbee_mode_title),
-            style = MaterialTheme.typography.bodyMedium
-        )
+    if (paneMode.isTabletMode) {
+        TabletTwoPane(
+            contentPadding = PaddingValues(0.dp),
+            modifier = modifier,
+            primary = {
+            Text(
+                text = stringResource(R.string.frisbee_mode_title),
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.frisbee_input_mode_label),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    val options = listOf(PlayerInputMode.COUNT, PlayerInputMode.NAMES)
-                    options.forEachIndexed { index, mode ->
-                        SegmentedButton(
-                            selected = uiState.inputMode == mode,
-                            onClick = { onInputModeChanged(mode) },
-                            shape = SegmentedButtonDefaults.itemShape(index, options.size)
-                        ) {
-                            Text(
-                                text = if (mode == PlayerInputMode.COUNT) {
-                                    stringResource(R.string.frisbee_input_mode_count)
-                                } else {
-                                    stringResource(R.string.frisbee_input_mode_names)
-                                }
-                            )
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.frisbee_input_mode_label),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        val options = listOf(PlayerInputMode.COUNT, PlayerInputMode.NAMES)
+                        options.forEachIndexed { index, mode ->
+                            SegmentedButton(
+                                selected = uiState.inputMode == mode,
+                                onClick = { onInputModeChanged(mode) },
+                                shape = SegmentedButtonDefaults.itemShape(index, options.size)
+                            ) {
+                                Text(
+                                    text = if (mode == PlayerInputMode.COUNT) {
+                                        stringResource(R.string.frisbee_input_mode_count)
+                                    } else {
+                                        stringResource(R.string.frisbee_input_mode_names)
+                                    }
+                                )
+                            }
                         }
                     }
-                }
 
-                if (uiState.inputMode == PlayerInputMode.COUNT) {
+                    if (uiState.inputMode == PlayerInputMode.COUNT) {
+                        NumberAdjuster(
+                            label = stringResource(R.string.frisbee_player_count_label),
+                            value = uiState.playerCount,
+                            range = 2..100,
+                            onChanged = onPlayerCountChanged
+                        )
+                    } else {
+                        OutlinedTextField(
+                            value = uiState.namesInput,
+                            onValueChange = onNamesInputChanged,
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text(stringResource(R.string.frisbee_names_label)) },
+                            placeholder = { Text(stringResource(R.string.frisbee_names_placeholder)) },
+                            minLines = 8
+                        )
+                    }
+
                     NumberAdjuster(
-                        label = stringResource(R.string.frisbee_player_count_label),
-                        value = uiState.playerCount,
-                        range = 2..100,
-                        onChanged = onPlayerCountChanged
+                        label = stringResource(R.string.frisbee_team_count_label),
+                        value = uiState.teamCount,
+                        range = 2..8,
+                        onChanged = onTeamCountChanged
                     )
-                } else {
-                    OutlinedTextField(
-                        value = uiState.namesInput,
-                        onValueChange = onNamesInputChanged,
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.frisbee_names_label)) },
-                        placeholder = { Text(stringResource(R.string.frisbee_names_placeholder)) },
-                        minLines = 4
+
+                    PaletteSelector(
+                        selected = uiState.palette,
+                        labels = paletteLabels,
+                        onChanged = onPaletteChanged
+                    )
+
+                    Text(
+                        text = stringResource(R.string.frisbee_team_size_hint, teamHint),
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
-
-                NumberAdjuster(
-                    label = stringResource(R.string.frisbee_team_count_label),
-                    value = uiState.teamCount,
-                    range = 2..8,
-                    onChanged = onTeamCountChanged
-                )
-
-                PaletteSelector(
-                    selected = uiState.palette,
-                    labels = paletteLabels,
-                    onChanged = onPaletteChanged
-                )
-
-                Text(
-                    text = stringResource(R.string.frisbee_team_size_hint, teamHint),
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
-        }
+        },
+            secondary = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(onClick = onStartCompass, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.frisbee_mode_compass))
+                }
+                OutlinedButton(onClick = onStartDraw, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.frisbee_mode_draw))
+                }
+            }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Text(
+                text = stringResource(R.string.frisbee_mode_compass_desc),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = stringResource(R.string.frisbee_mode_draw_desc),
+                style = MaterialTheme.typography.bodySmall
+            )
+            uiState.message?.let {
+                Text(text = it, style = MaterialTheme.typography.bodySmall)
+            }
+        })
+    } else {
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(onClick = onStartCompass, modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.frisbee_mode_compass))
-            }
-            OutlinedButton(onClick = onStartDraw, modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.frisbee_mode_draw))
-            }
-        }
+            Text(
+                text = stringResource(R.string.frisbee_mode_title),
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-        Text(
-            text = stringResource(R.string.frisbee_mode_compass_desc),
-            style = MaterialTheme.typography.bodySmall
-        )
-        Text(
-            text = stringResource(R.string.frisbee_mode_draw_desc),
-            style = MaterialTheme.typography.bodySmall
-        )
-        uiState.message?.let {
-            Text(text = it, style = MaterialTheme.typography.bodySmall)
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.frisbee_input_mode_label),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        val options = listOf(PlayerInputMode.COUNT, PlayerInputMode.NAMES)
+                        options.forEachIndexed { index, mode ->
+                            SegmentedButton(
+                                selected = uiState.inputMode == mode,
+                                onClick = { onInputModeChanged(mode) },
+                                shape = SegmentedButtonDefaults.itemShape(index, options.size)
+                            ) {
+                                Text(
+                                    text = if (mode == PlayerInputMode.COUNT) {
+                                        stringResource(R.string.frisbee_input_mode_count)
+                                    } else {
+                                        stringResource(R.string.frisbee_input_mode_names)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    if (uiState.inputMode == PlayerInputMode.COUNT) {
+                        NumberAdjuster(
+                            label = stringResource(R.string.frisbee_player_count_label),
+                            value = uiState.playerCount,
+                            range = 2..100,
+                            onChanged = onPlayerCountChanged
+                        )
+                    } else {
+                        OutlinedTextField(
+                            value = uiState.namesInput,
+                            onValueChange = onNamesInputChanged,
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text(stringResource(R.string.frisbee_names_label)) },
+                            placeholder = { Text(stringResource(R.string.frisbee_names_placeholder)) },
+                            minLines = 4
+                        )
+                    }
+
+                    NumberAdjuster(
+                        label = stringResource(R.string.frisbee_team_count_label),
+                        value = uiState.teamCount,
+                        range = 2..8,
+                        onChanged = onTeamCountChanged
+                    )
+
+                    PaletteSelector(
+                        selected = uiState.palette,
+                        labels = paletteLabels,
+                        onChanged = onPaletteChanged
+                    )
+
+                    Text(
+                        text = stringResource(R.string.frisbee_team_size_hint, teamHint),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(onClick = onStartCompass, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.frisbee_mode_compass))
+                }
+                OutlinedButton(onClick = onStartDraw, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.frisbee_mode_draw))
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.frisbee_mode_compass_desc),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = stringResource(R.string.frisbee_mode_draw_desc),
+                style = MaterialTheme.typography.bodySmall
+            )
+            uiState.message?.let {
+                Text(text = it, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
