@@ -29,7 +29,13 @@ data class ToolboxSettings(
     val sokobanVibrationEnabled: Boolean = true,
     val sokobanCompletedLevels: Int = 0,
     val sokobanBestMovesEncoded: String = "",
-    val sokobanLastLevelIndex: Int = DEFAULT_SOKOBAN_LAST_LEVEL_INDEX
+    val sokobanLastLevelIndex: Int = DEFAULT_SOKOBAN_LAST_LEVEL_INDEX,
+    val pomodoroWorkDurationMin: Int = DEFAULT_POMODORO_WORK_DURATION_MIN,
+    val pomodoroBreakDurationMin: Int = DEFAULT_POMODORO_BREAK_DURATION_MIN,
+    val pomodoroVibrationEnabled: Boolean = true,
+    val pomodoroAutoSwitchEnabled: Boolean = true,
+    val pomodoroDailyCompletedCount: Int = 0,
+    val pomodoroLastRecordDate: String = ""
 )
 
 enum class MinesweeperDifficulty {
@@ -47,3 +53,5 @@ const val DEFAULT_MINESWEEPER_BOARD_HEIGHT = 10
 const val DEFAULT_MINESWEEPER_MINE_COUNT = 20
 const val DEFAULT_TETRIS_START_LEVEL = 1
 const val DEFAULT_SOKOBAN_LAST_LEVEL_INDEX = 0
+const val DEFAULT_POMODORO_WORK_DURATION_MIN = 25
+const val DEFAULT_POMODORO_BREAK_DURATION_MIN = 5

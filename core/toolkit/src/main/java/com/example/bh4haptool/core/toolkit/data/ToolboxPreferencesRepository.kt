@@ -77,7 +77,19 @@ class ToolboxPreferencesRepository @Inject constructor(
             sokobanCompletedLevels = preferences[SOKOBAN_COMPLETED_LEVELS_KEY] ?: 0,
             sokobanBestMovesEncoded = preferences[SOKOBAN_BEST_MOVES_KEY].orEmpty(),
             sokobanLastLevelIndex =
-                preferences[SOKOBAN_LAST_LEVEL_INDEX_KEY] ?: DEFAULT_SOKOBAN_LAST_LEVEL_INDEX
+                preferences[SOKOBAN_LAST_LEVEL_INDEX_KEY] ?: DEFAULT_SOKOBAN_LAST_LEVEL_INDEX,
+            pomodoroWorkDurationMin =
+                preferences[POMODORO_WORK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_WORK_DURATION_MIN,
+            pomodoroBreakDurationMin =
+                preferences[POMODORO_BREAK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_BREAK_DURATION_MIN,
+            pomodoroVibrationEnabled =
+                preferences[POMODORO_VIBRATION_ENABLED_KEY] ?: true,
+            pomodoroAutoSwitchEnabled =
+                preferences[POMODORO_AUTO_SWITCH_ENABLED_KEY] ?: true,
+            pomodoroDailyCompletedCount =
+                preferences[POMODORO_DAILY_COMPLETED_COUNT_KEY] ?: 0,
+            pomodoroLastRecordDate =
+                preferences[POMODORO_LAST_RECORD_DATE_KEY].orEmpty()
         )
     }
 
@@ -261,6 +273,33 @@ class ToolboxPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updatePomodoroSettings(
+        workDurationMin: Int,
+        breakDurationMin: Int,
+        vibrationEnabled: Boolean,
+        autoSwitchEnabled: Boolean
+    ) {
+        context.toolboxDataStore.edit { preferences ->
+            preferences[POMODORO_WORK_DURATION_MIN_KEY] = workDurationMin.coerceAtLeast(1)
+            preferences[POMODORO_BREAK_DURATION_MIN_KEY] = breakDurationMin.coerceAtLeast(1)
+            preferences[POMODORO_VIBRATION_ENABLED_KEY] = vibrationEnabled
+            preferences[POMODORO_AUTO_SWITCH_ENABLED_KEY] = autoSwitchEnabled
+        }
+    }
+
+    suspend fun incrementPomodoroDailyCompletedCount(todayDate: String) {
+        context.toolboxDataStore.edit { preferences ->
+            val lastDate = preferences[POMODORO_LAST_RECORD_DATE_KEY].orEmpty()
+            val currentCount = if (lastDate == todayDate) {
+                preferences[POMODORO_DAILY_COMPLETED_COUNT_KEY] ?: 0
+            } else {
+                0
+            }
+            preferences[POMODORO_DAILY_COMPLETED_COUNT_KEY] = currentCount + 1
+            preferences[POMODORO_LAST_RECORD_DATE_KEY] = todayDate
+        }
+    }
+
     private fun decodeBestMoves(encoded: String): Map<Int, Int> {
         if (encoded.isBlank()) {
             return emptyMap()
@@ -326,5 +365,11 @@ class ToolboxPreferencesRepository @Inject constructor(
         val SOKOBAN_COMPLETED_LEVELS_KEY = intPreferencesKey("sokoban_completed_levels")
         val SOKOBAN_BEST_MOVES_KEY = stringPreferencesKey("sokoban_best_moves")
         val SOKOBAN_LAST_LEVEL_INDEX_KEY = intPreferencesKey("sokoban_last_level_index")
+        val POMODORO_WORK_DURATION_MIN_KEY = intPreferencesKey("pomodoro_work_duration_min")
+        val POMODORO_BREAK_DURATION_MIN_KEY = intPreferencesKey("pomodoro_break_duration_min")
+        val POMODORO_VIBRATION_ENABLED_KEY = booleanPreferencesKey("pomodoro_vibration_enabled")
+        val POMODORO_AUTO_SWITCH_ENABLED_KEY = booleanPreferencesKey("pomodoro_auto_switch_enabled")
+        val POMODORO_DAILY_COMPLETED_COUNT_KEY = intPreferencesKey("pomodoro_daily_completed_count")
+        val POMODORO_LAST_RECORD_DATE_KEY = stringPreferencesKey("pomodoro_last_record_date")
     }
 }

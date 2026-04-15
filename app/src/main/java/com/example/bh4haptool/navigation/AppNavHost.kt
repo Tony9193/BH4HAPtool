@@ -12,6 +12,10 @@ import com.example.bh4haptool.feature.frisbeegroup.navigation.FrisbeeGroupDestin
 import com.example.bh4haptool.feature.frisbeegroup.ui.FrisbeeGroupRoute
 import com.example.bh4haptool.feature.minesweeper.navigation.MinesweeperDestination
 import com.example.bh4haptool.feature.minesweeper.ui.MinesweeperRoute
+import com.example.bh4haptool.feature.pomodoro.navigation.PomodoroDestination
+import com.example.bh4haptool.feature.pomodoro.ui.PomodoroRoute
+import com.example.bh4haptool.feature.quickdecide.navigation.QuickDecideDestination
+import com.example.bh4haptool.feature.quickdecide.ui.QuickDecideRoute
 import com.example.bh4haptool.feature.sokoban.navigation.SokobanDestination
 import com.example.bh4haptool.feature.sokoban.ui.SokobanRoute
 import com.example.bh4haptool.feature.shakedraw.navigation.ShakeDrawDestination
@@ -76,6 +80,16 @@ fun AppNavHost(
         }
         composable(route = SokobanDestination.route) {
             SokobanRoute(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = PomodoroDestination.route) {
+            PomodoroRoute(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = QuickDecideDestination.route) {
+            QuickDecideRoute(
                 onBack = { navController.popBackStack() }
             )
         }

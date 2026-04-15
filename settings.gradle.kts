@@ -31,4 +31,6 @@ include(":feature:frisbeegroup")
 include(":feature:minesweeper")
 include(":feature:tetris")
 include(":feature:sokoban")
+include(":feature:pomodoro")
+include(":feature:quickdecide")
  

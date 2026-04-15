@@ -4,6 +4,8 @@ import com.example.bh4haptool.R
 import com.example.bh4haptool.feature.catchcat.navigation.CatchCatDestination
 import com.example.bh4haptool.feature.frisbeegroup.navigation.FrisbeeGroupDestination
 import com.example.bh4haptool.feature.minesweeper.navigation.MinesweeperDestination
+import com.example.bh4haptool.feature.pomodoro.navigation.PomodoroDestination
+import com.example.bh4haptool.feature.quickdecide.navigation.QuickDecideDestination
 import com.example.bh4haptool.feature.sokoban.navigation.SokobanDestination
 import com.example.bh4haptool.feature.shakedraw.navigation.ShakeDrawDestination
 import com.example.bh4haptool.feature.tetris.navigation.TetrisDestination
@@ -45,6 +47,18 @@ object ToolRegistry {
             titleRes = R.string.tool_sokoban_title,
             descriptionRes = R.string.tool_sokoban_description,
             route = SokobanDestination.route
+        ),
+        ToolEntry(
+            id = "pomodoro",
+            titleRes = R.string.tool_pomodoro_title,
+            descriptionRes = R.string.tool_pomodoro_description,
+            route = PomodoroDestination.route
+        ),
+        ToolEntry(
+            id = "quick_decide",
+            titleRes = R.string.tool_quick_decide_title,
+            descriptionRes = R.string.tool_quick_decide_description,
+            route = QuickDecideDestination.route
         )
     )
 }

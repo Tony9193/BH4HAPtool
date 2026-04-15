@@ -1,0 +1,17 @@
+<resources>
+    <string name="pomodoro_title">番茄钟</string>
+    <string name="pomodoro_back">返回</string>
+    <string name="pomodoro_phase_work">专注中</string>
+    <string name="pomodoro_phase_break">休息中</string>
+    <string name="pomodoro_start">开始</string>
+    <string name="pomodoro_pause">暂停</string>
+    <string name="pomodoro_reset">重置</string>
+    <string name="pomodoro_skip">跳过</string>
+    <string name="pomodoro_daily_completed">今日完成：%1$d 个番茄</string>
+    <string name="pomodoro_settings">设置</string>
+    <string name="pomodoro_work_duration">专注时长</string>
+    <string name="pomodoro_break_duration">休息时长</string>
+    <string name="pomodoro_vibration">震动提醒</string>
+    <string name="pomodoro_auto_switch">自动切换阶段</string>
+    <string name="pomodoro_minutes">%1$d 分钟</string>
+</resources>

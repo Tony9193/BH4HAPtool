@@ -15,6 +15,10 @@
     <string name="tool_tetris_description">经典堆叠消行玩法，支持速度与震动设置</string>
     <string name="tool_sokoban_title">推箱子</string>
     <string name="tool_sokoban_description">经典推箱子玩法，支持撤销、重开、选关和最优步数记录。</string>
+    <string name="tool_pomodoro_title">番茄钟</string>
+    <string name="tool_pomodoro_description">专注计时与休息提醒，记录每日完成番茄数。</string>
+    <string name="tool_quick_decide_title">速决</string>
+    <string name="tool_quick_decide_description">骰子、硬币、YES/NO 一键随机决策，零配置即用</string>
 
     <string name="settings_title">设置</string>
     <string name="settings_theme_mode">外观模式</string>

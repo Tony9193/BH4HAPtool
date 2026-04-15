@@ -33,10 +33,8 @@
   - 抽签核心逻辑
   - DataStore 偏好持久化
   - 通用 DI 绑定
-- feature/simpledraw
-  - 普通抽签子程序
 - feature/shakedraw
-  - 摇一摇抽签子程序
+  - 摇一摇抽签子程序（已合并普通抽签功能）
 
 ### 2.2 路由与页面层级
 

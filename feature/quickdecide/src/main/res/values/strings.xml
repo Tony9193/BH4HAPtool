@@ -1,0 +1,11 @@
+<resources>
+    <string name="quick_decide_back">返回</string>
+    <string name="quick_decide_title">速决</string>
+    <string name="quick_decide_dice">骰子</string>
+    <string name="quick_decide_coin">硬币</string>
+    <string name="quick_decide_yes_no">YES / NO</string>
+    <string name="quick_decide_heads">正面</string>
+    <string name="quick_decide_tails">反面</string>
+    <string name="quick_decide_yes">YES</string>
+    <string name="quick_decide_no">NO</string>
+</resources>

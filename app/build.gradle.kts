@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.bh4haptool"
         minSdk = 31
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,6 +45,8 @@ dependencies {
     implementation(project(":feature:minesweeper"))
     implementation(project(":feature:tetris"))
     implementation(project(":feature:sokoban"))
+    implementation(project(":feature:pomodoro"))
+    implementation(project(":feature:quickdecide"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
