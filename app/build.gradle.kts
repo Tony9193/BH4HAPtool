@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.bh4haptool"
         minSdk = 31
         targetSdk = 36
-        versionCode = 8
-        versionName = "1.6.0"
+        versionCode = 9
+        versionName = "1.16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

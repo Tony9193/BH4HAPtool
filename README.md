@@ -103,16 +103,18 @@
 - 设置页支持首页管理、记录中心、离线版本更新说明
 - 记录中心支持查看扫雷、俄罗斯方块、推箱子、番茄钟等统计与成就
 
-## v1.6.0 更新亮点
+## v1.16 更新亮点
 
 - 新增「AA分账器」，支持垫付均摊、排除成员和转账清单
 - 结算逻辑统一按“分”计算，保障小额场景下的精度
 - 新增 AA 分账历史与统计，并接入记录中心
 - 新增 AA 垫付结算成就（首单与累计里程碑）
 - 新增垫付金额弹窗计算器，支持四则运算并自动回填
+- 发布产物命名升级为 `BH4HAPtool-v1.16.apk`，便于版本识别与归档
 
 ## 版本记录
 
+- [v1.16 更新内容](docs/release-notes-v1.16.0.md)
 - [v1.6.0 更新内容](docs/release-notes-v1.6.0.md)
 - [v1.5.0 更新内容](docs/release-notes-v1.5.0.md)
 - [v1.4.0 更新内容](docs/release-notes-v1.4.0.md)
@@ -172,6 +174,7 @@ BH4HAPtool/
 - [子应用开发说明](docs/subprogram-development-guide.md)
 - [平板模式说明](docs/tablet-mode-guide.md)
 - [传感器说明](docs/sensor_guide.md)
+- [v1.16 更新内容](docs/release-notes-v1.16.0.md)
 - [v1.6.0 更新内容](docs/release-notes-v1.6.0.md)
 - [v1.5.0 更新内容](docs/release-notes-v1.5.0.md)
 - [v1.4.0 更新内容](docs/release-notes-v1.4.0.md)
