@@ -48,6 +48,11 @@ fun PartyModeRoute(
             title = "快速拍板",
             description = "先速决，再需要时补一个权重转盘做最后一轮定夺。",
             toolIds = listOf("quick_decide", "lucky_wheel")
+        ),
+        PartyTemplate(
+            title = "聚餐结算",
+            description = "现场记分后直接进入 AA 分账，自动处理垫付与转账清单。",
+            toolIds = listOf("scoreboard", "aa_splitter")
         )
     )
 

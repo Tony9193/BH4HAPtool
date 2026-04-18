@@ -37,6 +37,27 @@ fun ReleaseNotesRoute(
     val notes = remember {
         listOf(
             ReleaseNoteEntry(
+                version = "v1.6.0",
+                date = "2026-04-19",
+                content = context.resources.openRawResource(R.raw.release_notes_v160)
+                    .bufferedReader()
+                    .use { it.readText() }
+            ),
+            ReleaseNoteEntry(
+                version = "v1.5.0",
+                date = "2026-04-18",
+                content = context.resources.openRawResource(R.raw.release_notes_v150)
+                    .bufferedReader()
+                    .use { it.readText() }
+            ),
+            ReleaseNoteEntry(
+                version = "v1.4.0",
+                date = "2026-04-18",
+                content = context.resources.openRawResource(R.raw.release_notes_v140)
+                    .bufferedReader()
+                    .use { it.readText() }
+            ),
+            ReleaseNoteEntry(
                 version = "v1.3.0",
                 date = "2026-04-15",
                 content = context.resources.openRawResource(R.raw.release_notes_v130)

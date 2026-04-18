@@ -6,7 +6,10 @@ enum class ToolboxAchievementId {
     TETRIS_SCORE_1000,
     SOKOBAN_COMPLETE_10,
     POMODORO_DAILY_4,
-    USE_FIVE_TOOLS
+    USE_FIVE_TOOLS,
+    AA_PREPAYMENT_FIRST,
+    AA_PREPAYMENT_10,
+    AA_PREPAYMENT_50
 }
 
 object ToolboxProgressCodec {
@@ -81,6 +84,27 @@ object ToolboxProgressCodec {
             .sorted()
             .joinToString(separator = ",")
     }
+
+    fun decodeOpaqueList(encoded: String): List<String> {
+        if (encoded.isBlank()) {
+            return emptyList()
+        }
+
+        return encoded.split(',')
+            .mapNotNull { token ->
+                runCatching {
+                    String(java.util.Base64.getDecoder().decode(token), Charsets.UTF_8)
+                }.getOrNull()
+            }
+    }
+
+    fun encodeOpaqueList(values: List<String>): String {
+        return values
+            .filter { it.isNotBlank() }
+            .joinToString(separator = ",") { value ->
+                java.util.Base64.getEncoder().encodeToString(value.toByteArray(Charsets.UTF_8))
+            }
+    }
 }
 
 object ToolboxAchievements {
@@ -114,6 +138,18 @@ object ToolboxAchievements {
         val usedTools = usageStats.keys.filter { it.isNotBlank() }.toSet()
         if (usedTools.size >= 5) {
             unlocked += ToolboxAchievementId.USE_FIVE_TOOLS
+        }
+
+        if (settings.aaPrepaymentSettlementCount >= 1) {
+            unlocked += ToolboxAchievementId.AA_PREPAYMENT_FIRST
+        }
+
+        if (settings.aaPrepaymentSettlementCount >= 10) {
+            unlocked += ToolboxAchievementId.AA_PREPAYMENT_10
+        }
+
+        if (settings.aaPrepaymentSettlementCount >= 50) {
+            unlocked += ToolboxAchievementId.AA_PREPAYMENT_50
         }
 
         return unlocked

@@ -12,6 +12,8 @@ import com.example.bh4haptool.core.toolkit.data.ToolboxPreferencesRepository
 import com.example.bh4haptool.core.toolkit.data.ToolboxSettings
 import com.example.bh4haptool.feature.catchcat.navigation.CatchCatDestination
 import com.example.bh4haptool.feature.catchcat.ui.CatchCatRoute
+import com.example.bh4haptool.feature.aasplitter.navigation.AaSplitterDestination
+import com.example.bh4haptool.feature.aasplitter.ui.AaSplitterRoute
 import com.example.bh4haptool.feature.eventcountdown.navigation.EventCountdownDestination
 import com.example.bh4haptool.feature.eventcountdown.ui.EventCountdownRoute
 import com.example.bh4haptool.feature.frisbeegroup.navigation.FrisbeeGroupDestination
@@ -169,6 +171,11 @@ fun AppNavHost(
         }
         composable(route = QuickDecideDestination.route) {
             QuickDecideRoute(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = AaSplitterDestination.route) {
+            AaSplitterRoute(
                 onBack = { navController.popBackStack() }
             )
         }

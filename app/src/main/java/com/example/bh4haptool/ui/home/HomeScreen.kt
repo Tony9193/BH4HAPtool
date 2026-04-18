@@ -109,6 +109,15 @@ fun HomeRoute(
                 .take(4)
         }
     }
+    val hotEntries = remember(usageStats, orderedVisibleEntries) {
+        orderedVisibleEntries
+            .mapNotNull { entry ->
+                val count = usageStats[entry.id] ?: 0
+                if (count > 0) entry to count else null
+            }
+            .sortedWith(compareByDescending<Pair<ToolEntry, Int>> { it.second }.thenBy { it.first.order })
+            .take(4)
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -215,6 +224,20 @@ fun HomeRoute(
                 }
             }
 
+            if (query.isBlank() && !favoritesOnly && !recentOnly && !tabletOnly && hotEntries.isNotEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SectionTitle(title = stringResource(R.string.home_hot_title))
+                }
+                items(hotEntries, key = { "hot_${it.first.id}" }) { (tool, count) ->
+                    ToolEntryCard(
+                        tool = tool,
+                        isFavorite = favoriteIds.contains(tool.id),
+                        usageText = stringResource(R.string.home_hot_count, count),
+                        onClick = { onToolSelected(tool) }
+                    )
+                }
+            }
+
             ToolGroup.entries.forEach { group ->
                 val groupEntries = filteredEntries.filter { it.group == group }
                 if (groupEntries.isNotEmpty()) {
@@ -301,6 +324,7 @@ private fun FeaturedToolCard(
 private fun ToolEntryCard(
     tool: ToolEntry,
     isFavorite: Boolean,
+    usageText: String? = null,
     onClick: () -> Unit
 ) {
     Card(
@@ -378,6 +402,14 @@ private fun ToolEntryCard(
                         )
                     }
                 }
+            }
+
+            if (!usageText.isNullOrBlank()) {
+                Text(
+                    text = usageText,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

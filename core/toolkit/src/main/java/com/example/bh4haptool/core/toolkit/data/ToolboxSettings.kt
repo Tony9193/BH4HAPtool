@@ -44,7 +44,11 @@ data class ToolboxSettings(
     val pomodoroVibrationEnabled: Boolean = true,
     val pomodoroAutoSwitchEnabled: Boolean = true,
     val pomodoroDailyCompletedCount: Int = 0,
-    val pomodoroLastRecordDate: String = ""
+    val pomodoroLastRecordDate: String = "",
+    val aaSettlementHistoryEncoded: String = "",
+    val aaSettlementCount: Int = 0,
+    val aaPrepaymentSettlementCount: Int = 0,
+    val aaTotalSettledAmountCents: Long = 0L
 )
 
 enum class MinesweeperDifficulty {

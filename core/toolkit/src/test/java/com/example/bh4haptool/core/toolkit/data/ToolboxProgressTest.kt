@@ -44,4 +44,29 @@ class ToolboxProgressTest {
         assertTrue(unlocked.contains(ToolboxAchievementId.POMODORO_DAILY_4))
         assertTrue(unlocked.contains(ToolboxAchievementId.USE_FIVE_TOOLS))
     }
+
+    @Test
+    fun achievements_unlockAaMilestonesByPrepaymentCount() {
+        val settings = ToolboxSettings(
+            aaPrepaymentSettlementCount = 12
+        )
+
+        val unlocked = ToolboxAchievements.computeUnlocked(settings)
+
+        assertTrue(unlocked.contains(ToolboxAchievementId.AA_PREPAYMENT_FIRST))
+        assertTrue(unlocked.contains(ToolboxAchievementId.AA_PREPAYMENT_10))
+    }
+
+    @Test
+    fun opaqueListCodec_roundTripsSnapshotStrings() {
+        val snapshots = listOf(
+            "1690000000000|1000|0|3|3|2|abc",
+            "1690000001000|1234|10|4|3|3|def"
+        )
+
+        val encoded = ToolboxProgressCodec.encodeOpaqueList(snapshots)
+        val decoded = ToolboxProgressCodec.decodeOpaqueList(encoded)
+
+        assertEquals(snapshots, decoded)
+    }
 }

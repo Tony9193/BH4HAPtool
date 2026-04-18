@@ -12,6 +12,8 @@
     <string name="home_continue_badge">最近刚用过</string>
     <string name="home_common_title">我的常用</string>
     <string name="home_recent_title">最近使用</string>
+    <string name="home_hot_title">热度榜</string>
+    <string name="home_hot_count">累计使用 %1$d 次</string>
     <string name="home_empty_state">没有匹配到工具，试试换个关键词或者关闭筛选条件。</string>
     <string name="home_favorite_badge">收藏</string>
     <string name="home_tablet_badge">平板友好</string>
@@ -47,6 +49,8 @@
     <string name="tool_sokoban_description">经典推箱子玩法，支持撤销、重开、选关和最优步数记录。</string>
     <string name="tool_pomodoro_title">番茄钟</string>
     <string name="tool_pomodoro_description">专注计时与休息提醒，记录每日完成番茄数。</string>
+    <string name="tool_aa_splitter_title">AA分账器</string>
+    <string name="tool_aa_splitter_description">支持垫付均摊、排除成员与最少转账清单的聚餐结算工具。</string>
 
     <string name="settings_title">设置</string>
     <string name="settings_back">返回</string>
@@ -96,8 +100,17 @@
     <string name="records_summary_title">概览</string>
     <string name="records_summary_top_tool">最常使用：%1$s</string>
     <string name="records_summary_top_tool_empty">最常使用：还没有记录</string>
+    <string name="records_summary_launch_count">累计启动次数：%1$d</string>
     <string name="records_summary_recent_count">最近使用数量：%1$d</string>
     <string name="records_summary_tool_count">已使用不同工具数：%1$d</string>
+    <string name="records_summary_last_used_time">上次使用时间：%1$s</string>
+    <string name="records_summary_last_used_time_empty">上次使用时间：暂无</string>
+    <string name="records_usage_title">使用统计</string>
+    <string name="records_usage_empty">还没有启动记录，去首页试试一个工具吧。</string>
+    <string name="records_usage_item">%1$d. %2$s：%3$d 次（%4$d%%）</string>
+    <string name="records_recent_tools_title">最近使用序列</string>
+    <string name="records_recent_tools_empty">还没有最近使用记录。</string>
+    <string name="records_recent_tools_item">%1$d. %2$s</string>
     <string name="records_minesweeper_title">扫雷记录</string>
     <string name="records_minesweeper_wins_losses">胜负：%1$d 胜 / %2$d 负</string>
     <string name="records_minesweeper_win_rate">胜率：%1$d%%</string>
@@ -110,10 +123,18 @@
     <string name="records_sokoban_best_levels">已有最优步数关卡：%1$d</string>
     <string name="records_pomodoro_title">番茄钟记录</string>
     <string name="records_pomodoro_daily">今日完成番茄：%1$d</string>
+    <string name="records_pomodoro_last_record_date">最近记录日期：%1$s</string>
     <string name="records_pomodoro_duration">当前时长：专注 %1$d 分钟 / 休息 %2$d 分钟</string>
+    <string name="records_aa_title">AA分账记录</string>
+    <string name="records_aa_settlement_count">累计结算：%1$d 次</string>
+    <string name="records_aa_prepayment_count">垫付结算：%1$d 次</string>
+    <string name="records_aa_total_amount">累计金额：%1$s 元</string>
+    <string name="records_aa_history_count">历史保留：%1$d 条</string>
     <string name="records_achievements_title">成就</string>
+    <string name="records_achievements_summary">已解锁 %1$d / %2$d 项</string>
     <string name="records_achievement_unlocked">已解锁</string>
     <string name="records_achievement_locked">未解锁</string>
+    <string name="records_achievement_progress">进度：%1$d / %2$d</string>
 
     <string name="achievement_first_game_complete_title">初次通关</string>
     <string name="achievement_first_game_complete_desc">首次在任意小游戏里拿到一次有效完成记录。</string>
@@ -127,6 +148,12 @@
     <string name="achievement_pomodoro_daily_4_desc">单日完成 4 个番茄钟。</string>
     <string name="achievement_use_five_tools_title">全能工具人</string>
     <string name="achievement_use_five_tools_desc">累计使用过 5 个不同的工具或小游戏。</string>
+    <string name="achievement_aa_prepayment_first_title">第一笔分账</string>
+    <string name="achievement_aa_prepayment_first_desc">完成 1 次垫付均摊结算。</string>
+    <string name="achievement_aa_prepayment_10_title">分账常客</string>
+    <string name="achievement_aa_prepayment_10_desc">累计完成 10 次垫付均摊结算。</string>
+    <string name="achievement_aa_prepayment_50_title">结算专家</string>
+    <string name="achievement_aa_prepayment_50_desc">累计完成 50 次垫付均摊结算。</string>
 
     <string name="release_notes_title">版本更新</string>
     <string name="release_notes_back">返回</string>

@@ -175,6 +175,10 @@ class ToolboxPreferencesRepository @Inject constructor(
             preferences.remove(SOKOBAN_BEST_MOVES_KEY)
             preferences.remove(POMODORO_DAILY_COMPLETED_COUNT_KEY)
             preferences.remove(POMODORO_LAST_RECORD_DATE_KEY)
+            preferences.remove(AA_SETTLEMENT_HISTORY_KEY)
+            preferences.remove(AA_SETTLEMENT_COUNT_KEY)
+            preferences.remove(AA_PREPAYMENT_SETTLEMENT_COUNT_KEY)
+            preferences.remove(AA_TOTAL_SETTLED_AMOUNT_CENTS_KEY)
             refreshAchievements(preferences)
         }
     }
@@ -358,6 +362,41 @@ class ToolboxPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun recordAaPrepaymentSettlement(
+        totalCents: Long,
+        snapshotEncoded: String
+    ) {
+        if (snapshotEncoded.isBlank()) {
+            return
+        }
+
+        context.toolboxDataStore.edit { preferences ->
+            val history = ToolboxProgressCodec.decodeOpaqueList(
+                preferences[AA_SETTLEMENT_HISTORY_KEY].orEmpty()
+            )
+            val updatedHistory = buildList {
+                add(snapshotEncoded)
+                addAll(history)
+            }.take(MAX_AA_SETTLEMENT_HISTORY)
+
+            val currentCount = preferences[AA_SETTLEMENT_COUNT_KEY] ?: 0
+            val currentPrepaymentCount = preferences[AA_PREPAYMENT_SETTLEMENT_COUNT_KEY] ?: 0
+            val currentAmount = preferences[AA_TOTAL_SETTLED_AMOUNT_CENTS_KEY] ?: 0L
+
+            preferences[AA_SETTLEMENT_HISTORY_KEY] = ToolboxProgressCodec.encodeOpaqueList(updatedHistory)
+            preferences[AA_SETTLEMENT_COUNT_KEY] = currentCount + 1
+            preferences[AA_PREPAYMENT_SETTLEMENT_COUNT_KEY] = currentPrepaymentCount + 1
+            preferences[AA_TOTAL_SETTLED_AMOUNT_CENTS_KEY] = currentAmount + totalCents.coerceAtLeast(0L)
+            refreshAchievements(preferences)
+        }
+    }
+
+    suspend fun clearAaSettlementHistory() {
+        context.toolboxDataStore.edit { preferences ->
+            preferences.remove(AA_SETTLEMENT_HISTORY_KEY)
+        }
+    }
+
     private fun refreshAchievements(preferences: MutablePreferences) {
         val unlocked = ToolboxAchievements.computeUnlocked(preferences.toToolboxSettings())
         preferences[ACHIEVEMENT_STATES_KEY] = ToolboxProgressCodec.encodeAchievements(unlocked)
@@ -437,7 +476,15 @@ class ToolboxPreferencesRepository @Inject constructor(
             pomodoroDailyCompletedCount =
                 this[POMODORO_DAILY_COMPLETED_COUNT_KEY] ?: 0,
             pomodoroLastRecordDate =
-                this[POMODORO_LAST_RECORD_DATE_KEY].orEmpty()
+                this[POMODORO_LAST_RECORD_DATE_KEY].orEmpty(),
+            aaSettlementHistoryEncoded =
+                this[AA_SETTLEMENT_HISTORY_KEY].orEmpty(),
+            aaSettlementCount =
+                this[AA_SETTLEMENT_COUNT_KEY] ?: 0,
+            aaPrepaymentSettlementCount =
+                this[AA_PREPAYMENT_SETTLEMENT_COUNT_KEY] ?: 0,
+            aaTotalSettledAmountCents =
+                this[AA_TOTAL_SETTLED_AMOUNT_CENTS_KEY] ?: 0L
         )
     }
 
@@ -470,6 +517,7 @@ class ToolboxPreferencesRepository @Inject constructor(
 
     private companion object {
         private const val MAX_RECENT_TOOLS = 6
+        private const val MAX_AA_SETTLEMENT_HISTORY = 20
 
         val SIMPLE_DRAW_CANDIDATES_KEY = stringPreferencesKey("simple_draw_candidates")
         val SHAKE_DRAW_CANDIDATES_KEY = stringPreferencesKey("shake_draw_candidates")
@@ -523,5 +571,11 @@ class ToolboxPreferencesRepository @Inject constructor(
         val POMODORO_DAILY_COMPLETED_COUNT_KEY =
             intPreferencesKey("pomodoro_daily_completed_count")
         val POMODORO_LAST_RECORD_DATE_KEY = stringPreferencesKey("pomodoro_last_record_date")
+        val AA_SETTLEMENT_HISTORY_KEY = stringPreferencesKey("aa_settlement_history")
+        val AA_SETTLEMENT_COUNT_KEY = intPreferencesKey("aa_settlement_count")
+        val AA_PREPAYMENT_SETTLEMENT_COUNT_KEY =
+            intPreferencesKey("aa_prepayment_settlement_count")
+        val AA_TOTAL_SETTLED_AMOUNT_CENTS_KEY =
+            longPreferencesKey("aa_total_settled_amount_cents")
     }
 }

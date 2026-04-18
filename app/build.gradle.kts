@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.bh4haptool"
         minSdk = 31
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.4.0"
+        versionCode = 8
+        versionName = "1.6.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":feature:scoreboard"))
     implementation(project(":feature:turnqueue"))
     implementation(project(":feature:eventcountdown"))
+    implementation(project(":feature:aasplitter"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

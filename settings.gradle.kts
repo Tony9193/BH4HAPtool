@@ -37,4 +37,5 @@ include(":feature:luckywheel")
 include(":feature:scoreboard")
 include(":feature:turnqueue")
 include(":feature:eventcountdown")
+include(":feature:aasplitter")
  

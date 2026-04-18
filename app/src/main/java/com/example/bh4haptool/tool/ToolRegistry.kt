@@ -2,6 +2,7 @@ package com.example.bh4haptool.tool
 
 import com.example.bh4haptool.R
 import com.example.bh4haptool.feature.eventcountdown.navigation.EventCountdownDestination
+import com.example.bh4haptool.feature.aasplitter.navigation.AaSplitterDestination
 import com.example.bh4haptool.feature.catchcat.navigation.CatchCatDestination
 import com.example.bh4haptool.feature.frisbeegroup.navigation.FrisbeeGroupDestination
 import com.example.bh4haptool.feature.luckywheel.navigation.LuckyWheelDestination
@@ -170,6 +171,18 @@ object ToolRegistry {
             order = 80,
             tags = listOf("番茄钟", "专注", "计时", "效率"),
             iconRes = android.R.drawable.ic_menu_recent_history,
+            isFeatured = true,
+            supportsTablet = true
+        ),
+        ToolEntry(
+            id = "aa_splitter",
+            titleRes = R.string.tool_aa_splitter_title,
+            descriptionRes = R.string.tool_aa_splitter_description,
+            route = AaSplitterDestination.route,
+            group = ToolGroup.FOCUS,
+            order = 85,
+            tags = listOf("aa", "分账", "垫付", "均摊"),
+            iconRes = android.R.drawable.ic_menu_share,
             isFeatured = true,
             supportsTablet = true
         )
