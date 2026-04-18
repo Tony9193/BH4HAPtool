@@ -95,15 +95,16 @@
 - 设置页支持首页管理、记录中心、离线版本更新说明
 - 记录中心支持查看扫雷、俄罗斯方块、推箱子、番茄钟等统计与成就
 
-## v1.3.0 更新亮点
+## v1.4.0 更新亮点
 
-- 新增「速决」工具模块，提供骰子、硬币、YES/NO 一键决策
-- 零配置设计，打开即用，响应迅速
-- 延续多模块架构，新增 `feature:quickdecide` 独立模块
-- 补充图标扩展依赖与相关文档
+- 首页升级为工具合集首页，支持分组浏览、搜索、收藏、最近使用与继续上次
+- 新增记录中心与离线成就体系，聚合小游戏成绩与工具使用统计
+- 新增幸运转盘、活动记分板、轮次管理器、活动倒计时与派对模式入口
+- 修复首页重复 key 导致的模拟器闪退问题，提升稳定性
 
-## 历史版本
+## 版本记录
 
+- [v1.4.0 更新内容](docs/release-notes-v1.4.0.md)
 - [v1.3.0 更新内容](docs/release-notes-v1.3.0.md)
 - [v1.2.0 更新内容](docs/release-notes-v1.2.0.md)
 
@@ -159,6 +160,8 @@ BH4HAPtool/
 - [子应用开发说明](docs/subprogram-development-guide.md)
 - [平板模式说明](docs/tablet-mode-guide.md)
 - [传感器说明](docs/sensor_guide.md)
+- [v1.4.0 更新内容](docs/release-notes-v1.4.0.md)
+- [v1.3.0 更新内容](docs/release-notes-v1.3.0.md)
 - [v1.2.0 更新内容](docs/release-notes-v1.2.0.md)
 
 ## 后续方向
