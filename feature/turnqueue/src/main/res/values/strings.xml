@@ -1,0 +1,14 @@
+<resources>
+    <string name="turn_queue_title">轮次管理器</string>
+    <string name="turn_queue_back">返回</string>
+    <string name="turn_queue_ready_hint">等待开始</string>
+    <string name="turn_queue_round">当前轮次：第 %1$d 轮</string>
+    <string name="turn_queue_participants">参与者名单</string>
+    <string name="turn_queue_start">开始</string>
+    <string name="turn_queue_next">下一位</string>
+    <string name="turn_queue_eliminate">淘汰当前</string>
+    <string name="turn_queue_reset">重置</string>
+    <string name="turn_queue_mode_random">随机先手</string>
+    <string name="turn_queue_mode_sequential">顺序轮转</string>
+    <string name="turn_queue_mode_elimination">淘汰模式</string>
+</resources>

@@ -47,6 +47,10 @@ dependencies {
     implementation(project(":feature:sokoban"))
     implementation(project(":feature:pomodoro"))
     implementation(project(":feature:quickdecide"))
+    implementation(project(":feature:luckywheel"))
+    implementation(project(":feature:scoreboard"))
+    implementation(project(":feature:turnqueue"))
+    implementation(project(":feature:eventcountdown"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -57,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)

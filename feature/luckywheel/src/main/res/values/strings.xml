@@ -1,0 +1,14 @@
+<resources>
+    <string name="lucky_wheel_title">幸运转盘</string>
+    <string name="lucky_wheel_back">返回</string>
+    <string name="lucky_wheel_ready_hint">准备开始</string>
+    <string name="lucky_wheel_spin">开始抽取</string>
+    <string name="lucky_wheel_reset_pool">重置候选池</string>
+    <string name="lucky_wheel_history">最近结果</string>
+    <string name="lucky_wheel_options_title">候选项</string>
+    <string name="lucky_wheel_options_desc">每行一个选项，支持“名称|权重”格式，例如“火锅|2”。</string>
+    <string name="lucky_wheel_options_label">候选项列表</string>
+    <string name="lucky_wheel_remove_after_draw">抽后移除</string>
+    <string name="lucky_wheel_remove_after_draw_desc">开启后，同一项在本轮重置前不会重复被抽中。</string>
+    <string name="lucky_wheel_remaining_count">当前可抽数量：%1$d</string>
+</resources>

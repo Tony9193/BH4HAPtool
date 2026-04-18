@@ -33,4 +33,8 @@ include(":feature:tetris")
 include(":feature:sokoban")
 include(":feature:pomodoro")
 include(":feature:quickdecide")
+include(":feature:luckywheel")
+include(":feature:scoreboard")
+include(":feature:turnqueue")
+include(":feature:eventcountdown")
  

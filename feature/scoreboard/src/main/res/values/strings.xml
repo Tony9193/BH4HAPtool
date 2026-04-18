@@ -1,0 +1,10 @@
+<resources>
+    <string name="scoreboard_title">活动记分板</string>
+    <string name="scoreboard_back">返回</string>
+    <string name="scoreboard_standings">当前排名</string>
+    <string name="scoreboard_add_team">加一队</string>
+    <string name="scoreboard_remove_team">移除</string>
+    <string name="scoreboard_team_name">队伍名称</string>
+    <string name="scoreboard_undo">撤销</string>
+    <string name="scoreboard_reset">清零</string>
+</resources>

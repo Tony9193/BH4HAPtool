@@ -2,11 +2,13 @@ package com.example.bh4haptool.core.toolkit.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,79 +20,14 @@ import javax.inject.Singleton
 private val Context.toolboxDataStore: DataStore<Preferences> by preferencesDataStore(name = "toolbox_settings")
 
 /**
- * Central persistence gateway for all toolbox feature settings and statistics.
+ * Central persistence gateway for all toolbox feature settings, home customizations and statistics.
  */
 @Singleton
 class ToolboxPreferencesRepository @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
     val settingsFlow: Flow<ToolboxSettings> = context.toolboxDataStore.data.map { preferences ->
-        ToolboxSettings(
-            simpleDrawCandidates = preferences[SIMPLE_DRAW_CANDIDATES_KEY].orEmpty(),
-            shakeDrawCandidates = preferences[SHAKE_DRAW_CANDIDATES_KEY].orEmpty(),
-            shakeGyroscopeThreshold =
-                preferences[SHAKE_GYROSCOPE_THRESHOLD_KEY] ?: DEFAULT_GYROSCOPE_THRESHOLD,
-            shakeAccelerometerThreshold =
-                preferences[SHAKE_ACCELEROMETER_THRESHOLD_KEY] ?: DEFAULT_ACCELEROMETER_THRESHOLD,
-            shakeCooldownMs = preferences[SHAKE_COOLDOWN_MS_KEY] ?: DEFAULT_SHAKE_COOLDOWN_MS,
-            darkThemeConfig = DarkThemeConfig.valueOf(
-                preferences[DARK_THEME_CONFIG_KEY] ?: DarkThemeConfig.FOLLOW_SYSTEM.name
-            ),
-            appThemeColor = AppThemeColor.valueOf(
-                preferences[APP_THEME_COLOR_KEY] ?: AppThemeColor.DEFAULT.name
-            ),
-            minesweeperDifficulty = runCatching {
-                MinesweeperDifficulty.valueOf(
-                    preferences[MINESWEEPER_DIFFICULTY_KEY]
-                        ?: MinesweeperDifficulty.NORMAL.name
-                )
-            }.getOrDefault(MinesweeperDifficulty.NORMAL),
-            minesweeperBoardWidth =
-                preferences[MINESWEEPER_BOARD_WIDTH_KEY] ?: DEFAULT_MINESWEEPER_BOARD_WIDTH,
-            minesweeperBoardHeight =
-                preferences[MINESWEEPER_BOARD_HEIGHT_KEY] ?: DEFAULT_MINESWEEPER_BOARD_HEIGHT,
-            minesweeperMineCount =
-                preferences[MINESWEEPER_MINE_COUNT_KEY] ?: DEFAULT_MINESWEEPER_MINE_COUNT,
-            minesweeperFirstClickSafe =
-                preferences[MINESWEEPER_FIRST_CLICK_SAFE_KEY] ?: true,
-            minesweeperQuestionMarkEnabled =
-                preferences[MINESWEEPER_QUESTION_MARK_ENABLED_KEY] ?: true,
-            minesweeperAutoExpandEnabled =
-                preferences[MINESWEEPER_AUTO_EXPAND_ENABLED_KEY] ?: true,
-            minesweeperSoundEnabled =
-                preferences[MINESWEEPER_SOUND_ENABLED_KEY] ?: false,
-            minesweeperVibrationEnabled =
-                preferences[MINESWEEPER_VIBRATION_ENABLED_KEY] ?: true,
-            minesweeperWins = preferences[MINESWEEPER_WINS_KEY] ?: 0,
-            minesweeperLosses = preferences[MINESWEEPER_LOSSES_KEY] ?: 0,
-            minesweeperBestTimeEasySec = preferences[MINESWEEPER_BEST_EASY_KEY] ?: 0,
-            minesweeperBestTimeNormalSec = preferences[MINESWEEPER_BEST_NORMAL_KEY] ?: 0,
-            minesweeperBestTimeHardSec = preferences[MINESWEEPER_BEST_HARD_KEY] ?: 0,
-            tetrisStartLevel =
-                preferences[TETRIS_START_LEVEL_KEY] ?: DEFAULT_TETRIS_START_LEVEL,
-            tetrisVibrationEnabled =
-                preferences[TETRIS_VIBRATION_ENABLED_KEY] ?: true,
-            tetrisHighScore = preferences[TETRIS_HIGH_SCORE_KEY] ?: 0,
-            tetrisBestLevel = preferences[TETRIS_BEST_LEVEL_KEY] ?: DEFAULT_TETRIS_START_LEVEL,
-            sokobanVibrationEnabled =
-                preferences[SOKOBAN_VIBRATION_ENABLED_KEY] ?: true,
-            sokobanCompletedLevels = preferences[SOKOBAN_COMPLETED_LEVELS_KEY] ?: 0,
-            sokobanBestMovesEncoded = preferences[SOKOBAN_BEST_MOVES_KEY].orEmpty(),
-            sokobanLastLevelIndex =
-                preferences[SOKOBAN_LAST_LEVEL_INDEX_KEY] ?: DEFAULT_SOKOBAN_LAST_LEVEL_INDEX,
-            pomodoroWorkDurationMin =
-                preferences[POMODORO_WORK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_WORK_DURATION_MIN,
-            pomodoroBreakDurationMin =
-                preferences[POMODORO_BREAK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_BREAK_DURATION_MIN,
-            pomodoroVibrationEnabled =
-                preferences[POMODORO_VIBRATION_ENABLED_KEY] ?: true,
-            pomodoroAutoSwitchEnabled =
-                preferences[POMODORO_AUTO_SWITCH_ENABLED_KEY] ?: true,
-            pomodoroDailyCompletedCount =
-                preferences[POMODORO_DAILY_COMPLETED_COUNT_KEY] ?: 0,
-            pomodoroLastRecordDate =
-                preferences[POMODORO_LAST_RECORD_DATE_KEY].orEmpty()
-        )
+        preferences.toToolboxSettings()
     }
 
     suspend fun updateSimpleDrawCandidates(value: String) {
@@ -135,6 +72,119 @@ class ToolboxPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateHostModeKeepScreenOn(enabled: Boolean) {
+        context.toolboxDataStore.edit { preferences ->
+            preferences[HOST_MODE_KEEP_SCREEN_ON_KEY] = enabled
+        }
+    }
+
+    suspend fun setToolFavorite(toolId: String, favorite: Boolean) {
+        context.toolboxDataStore.edit { preferences ->
+            val favorites = ToolboxProgressCodec.decodeIdList(
+                preferences[FAVORITE_TOOL_IDS_KEY].orEmpty()
+            ).toMutableList()
+
+            if (favorite) {
+                if (!favorites.contains(toolId)) {
+                    favorites += toolId
+                }
+            } else {
+                favorites.remove(toolId)
+            }
+
+            preferences[FAVORITE_TOOL_IDS_KEY] = ToolboxProgressCodec.encodeIdList(favorites)
+        }
+    }
+
+    suspend fun setToolHidden(toolId: String, hidden: Boolean) {
+        context.toolboxDataStore.edit { preferences ->
+            val hiddenIds = ToolboxProgressCodec.decodeIdList(
+                preferences[HIDDEN_TOOL_IDS_KEY].orEmpty()
+            ).toMutableList()
+
+            if (hidden) {
+                if (!hiddenIds.contains(toolId)) {
+                    hiddenIds += toolId
+                }
+            } else {
+                hiddenIds.remove(toolId)
+            }
+
+            preferences[HIDDEN_TOOL_IDS_KEY] = ToolboxProgressCodec.encodeIdList(hiddenIds)
+        }
+    }
+
+    suspend fun updateCustomToolOrder(toolIds: List<String>) {
+        context.toolboxDataStore.edit { preferences ->
+            preferences[CUSTOM_TOOL_ORDER_KEY] = ToolboxProgressCodec.encodeIdList(toolIds)
+        }
+    }
+
+    suspend fun recordToolLaunch(
+        toolId: String,
+        launchedAtMillis: Long = System.currentTimeMillis()
+    ) {
+        context.toolboxDataStore.edit { preferences ->
+            val recent = ToolboxProgressCodec.decodeIdList(
+                preferences[RECENT_TOOL_IDS_KEY].orEmpty()
+            )
+            val updatedRecent = buildList {
+                add(toolId)
+                addAll(recent.filterNot { it == toolId })
+            }.take(MAX_RECENT_TOOLS)
+
+            val usageStats = ToolboxProgressCodec.decodeUsageStats(
+                preferences[TOOL_USAGE_STATS_KEY].orEmpty()
+            ).toMutableMap()
+            usageStats[toolId] = (usageStats[toolId] ?: 0) + 1
+
+            preferences[RECENT_TOOL_IDS_KEY] = ToolboxProgressCodec.encodeIdList(updatedRecent)
+            preferences[LAST_USED_TOOL_ID_KEY] = toolId
+            preferences[LAST_USED_AT_KEY] = launchedAtMillis
+            preferences[TOOL_USAGE_STATS_KEY] = ToolboxProgressCodec.encodeUsageStats(usageStats)
+            refreshAchievements(preferences)
+        }
+    }
+
+    suspend fun clearHomeConfiguration() {
+        context.toolboxDataStore.edit { preferences ->
+            preferences.remove(FAVORITE_TOOL_IDS_KEY)
+            preferences.remove(RECENT_TOOL_IDS_KEY)
+            preferences.remove(HIDDEN_TOOL_IDS_KEY)
+            preferences.remove(CUSTOM_TOOL_ORDER_KEY)
+            preferences.remove(LAST_USED_TOOL_ID_KEY)
+            preferences.remove(LAST_USED_AT_KEY)
+        }
+    }
+
+    suspend fun clearRecords() {
+        context.toolboxDataStore.edit { preferences ->
+            preferences.remove(RECENT_TOOL_IDS_KEY)
+            preferences.remove(TOOL_USAGE_STATS_KEY)
+            preferences.remove(ACHIEVEMENT_STATES_KEY)
+            preferences.remove(LAST_USED_TOOL_ID_KEY)
+            preferences.remove(LAST_USED_AT_KEY)
+            preferences.remove(MINESWEEPER_WINS_KEY)
+            preferences.remove(MINESWEEPER_LOSSES_KEY)
+            preferences.remove(MINESWEEPER_BEST_EASY_KEY)
+            preferences.remove(MINESWEEPER_BEST_NORMAL_KEY)
+            preferences.remove(MINESWEEPER_BEST_HARD_KEY)
+            preferences.remove(TETRIS_HIGH_SCORE_KEY)
+            preferences.remove(TETRIS_BEST_LEVEL_KEY)
+            preferences.remove(SOKOBAN_COMPLETED_LEVELS_KEY)
+            preferences.remove(SOKOBAN_BEST_MOVES_KEY)
+            preferences.remove(POMODORO_DAILY_COMPLETED_COUNT_KEY)
+            preferences.remove(POMODORO_LAST_RECORD_DATE_KEY)
+            refreshAchievements(preferences)
+        }
+    }
+
+    suspend fun resetAllPreferences() {
+        context.toolboxDataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
+
     suspend fun updateMinesweeperConfig(
         difficulty: MinesweeperDifficulty,
         boardWidth: Int,
@@ -163,6 +213,7 @@ class ToolboxPreferencesRepository @Inject constructor(
         context.toolboxDataStore.edit { preferences ->
             val current = preferences[MINESWEEPER_WINS_KEY] ?: 0
             preferences[MINESWEEPER_WINS_KEY] = current + 1
+            refreshAchievements(preferences)
         }
     }
 
@@ -170,6 +221,7 @@ class ToolboxPreferencesRepository @Inject constructor(
         context.toolboxDataStore.edit { preferences ->
             val current = preferences[MINESWEEPER_LOSSES_KEY] ?: 0
             preferences[MINESWEEPER_LOSSES_KEY] = current + 1
+            refreshAchievements(preferences)
         }
     }
 
@@ -180,6 +232,7 @@ class ToolboxPreferencesRepository @Inject constructor(
         if (elapsedSeconds <= 0) {
             return
         }
+
         context.toolboxDataStore.edit { preferences ->
             when (difficulty) {
                 MinesweeperDifficulty.EASY -> {
@@ -231,6 +284,8 @@ class ToolboxPreferencesRepository @Inject constructor(
             if (bestLevel > currentBestLevel) {
                 preferences[TETRIS_BEST_LEVEL_KEY] = bestLevel
             }
+
+            refreshAchievements(preferences)
         }
     }
 
@@ -244,6 +299,7 @@ class ToolboxPreferencesRepository @Inject constructor(
         context.toolboxDataStore.edit { preferences ->
             val current = preferences[SOKOBAN_COMPLETED_LEVELS_KEY] ?: 0
             preferences[SOKOBAN_COMPLETED_LEVELS_KEY] = current + 1
+            refreshAchievements(preferences)
         }
     }
 
@@ -295,9 +351,94 @@ class ToolboxPreferencesRepository @Inject constructor(
             } else {
                 0
             }
+
             preferences[POMODORO_DAILY_COMPLETED_COUNT_KEY] = currentCount + 1
             preferences[POMODORO_LAST_RECORD_DATE_KEY] = todayDate
+            refreshAchievements(preferences)
         }
+    }
+
+    private fun refreshAchievements(preferences: MutablePreferences) {
+        val unlocked = ToolboxAchievements.computeUnlocked(preferences.toToolboxSettings())
+        preferences[ACHIEVEMENT_STATES_KEY] = ToolboxProgressCodec.encodeAchievements(unlocked)
+    }
+
+    private fun Preferences.toToolboxSettings(): ToolboxSettings {
+        return ToolboxSettings(
+            simpleDrawCandidates = this[SIMPLE_DRAW_CANDIDATES_KEY].orEmpty(),
+            shakeDrawCandidates = this[SHAKE_DRAW_CANDIDATES_KEY].orEmpty(),
+            shakeGyroscopeThreshold =
+                this[SHAKE_GYROSCOPE_THRESHOLD_KEY] ?: DEFAULT_GYROSCOPE_THRESHOLD,
+            shakeAccelerometerThreshold =
+                this[SHAKE_ACCELEROMETER_THRESHOLD_KEY] ?: DEFAULT_ACCELEROMETER_THRESHOLD,
+            shakeCooldownMs = this[SHAKE_COOLDOWN_MS_KEY] ?: DEFAULT_SHAKE_COOLDOWN_MS,
+            darkThemeConfig = runCatching {
+                DarkThemeConfig.valueOf(
+                    this[DARK_THEME_CONFIG_KEY] ?: DarkThemeConfig.FOLLOW_SYSTEM.name
+                )
+            }.getOrDefault(DarkThemeConfig.FOLLOW_SYSTEM),
+            appThemeColor = runCatching {
+                AppThemeColor.valueOf(
+                    this[APP_THEME_COLOR_KEY] ?: AppThemeColor.DEFAULT.name
+                )
+            }.getOrDefault(AppThemeColor.DEFAULT),
+            favoriteToolIdsEncoded = this[FAVORITE_TOOL_IDS_KEY].orEmpty(),
+            recentToolIdsEncoded = this[RECENT_TOOL_IDS_KEY].orEmpty(),
+            hiddenToolIdsEncoded = this[HIDDEN_TOOL_IDS_KEY].orEmpty(),
+            customToolOrderEncoded = this[CUSTOM_TOOL_ORDER_KEY].orEmpty(),
+            toolUsageStatsEncoded = this[TOOL_USAGE_STATS_KEY].orEmpty(),
+            achievementStatesEncoded = this[ACHIEVEMENT_STATES_KEY].orEmpty(),
+            lastUsedToolId = this[LAST_USED_TOOL_ID_KEY].orEmpty(),
+            lastUsedAtMillis = this[LAST_USED_AT_KEY] ?: 0L,
+            hostModeKeepScreenOn = this[HOST_MODE_KEEP_SCREEN_ON_KEY] ?: true,
+            minesweeperDifficulty = runCatching {
+                MinesweeperDifficulty.valueOf(
+                    this[MINESWEEPER_DIFFICULTY_KEY] ?: MinesweeperDifficulty.NORMAL.name
+                )
+            }.getOrDefault(MinesweeperDifficulty.NORMAL),
+            minesweeperBoardWidth =
+                this[MINESWEEPER_BOARD_WIDTH_KEY] ?: DEFAULT_MINESWEEPER_BOARD_WIDTH,
+            minesweeperBoardHeight =
+                this[MINESWEEPER_BOARD_HEIGHT_KEY] ?: DEFAULT_MINESWEEPER_BOARD_HEIGHT,
+            minesweeperMineCount =
+                this[MINESWEEPER_MINE_COUNT_KEY] ?: DEFAULT_MINESWEEPER_MINE_COUNT,
+            minesweeperFirstClickSafe =
+                this[MINESWEEPER_FIRST_CLICK_SAFE_KEY] ?: true,
+            minesweeperQuestionMarkEnabled =
+                this[MINESWEEPER_QUESTION_MARK_ENABLED_KEY] ?: true,
+            minesweeperAutoExpandEnabled =
+                this[MINESWEEPER_AUTO_EXPAND_ENABLED_KEY] ?: true,
+            minesweeperSoundEnabled =
+                this[MINESWEEPER_SOUND_ENABLED_KEY] ?: false,
+            minesweeperVibrationEnabled =
+                this[MINESWEEPER_VIBRATION_ENABLED_KEY] ?: true,
+            minesweeperWins = this[MINESWEEPER_WINS_KEY] ?: 0,
+            minesweeperLosses = this[MINESWEEPER_LOSSES_KEY] ?: 0,
+            minesweeperBestTimeEasySec = this[MINESWEEPER_BEST_EASY_KEY] ?: 0,
+            minesweeperBestTimeNormalSec = this[MINESWEEPER_BEST_NORMAL_KEY] ?: 0,
+            minesweeperBestTimeHardSec = this[MINESWEEPER_BEST_HARD_KEY] ?: 0,
+            tetrisStartLevel = this[TETRIS_START_LEVEL_KEY] ?: DEFAULT_TETRIS_START_LEVEL,
+            tetrisVibrationEnabled = this[TETRIS_VIBRATION_ENABLED_KEY] ?: true,
+            tetrisHighScore = this[TETRIS_HIGH_SCORE_KEY] ?: 0,
+            tetrisBestLevel = this[TETRIS_BEST_LEVEL_KEY] ?: DEFAULT_TETRIS_START_LEVEL,
+            sokobanVibrationEnabled = this[SOKOBAN_VIBRATION_ENABLED_KEY] ?: true,
+            sokobanCompletedLevels = this[SOKOBAN_COMPLETED_LEVELS_KEY] ?: 0,
+            sokobanBestMovesEncoded = this[SOKOBAN_BEST_MOVES_KEY].orEmpty(),
+            sokobanLastLevelIndex =
+                this[SOKOBAN_LAST_LEVEL_INDEX_KEY] ?: DEFAULT_SOKOBAN_LAST_LEVEL_INDEX,
+            pomodoroWorkDurationMin =
+                this[POMODORO_WORK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_WORK_DURATION_MIN,
+            pomodoroBreakDurationMin =
+                this[POMODORO_BREAK_DURATION_MIN_KEY] ?: DEFAULT_POMODORO_BREAK_DURATION_MIN,
+            pomodoroVibrationEnabled =
+                this[POMODORO_VIBRATION_ENABLED_KEY] ?: true,
+            pomodoroAutoSwitchEnabled =
+                this[POMODORO_AUTO_SWITCH_ENABLED_KEY] ?: true,
+            pomodoroDailyCompletedCount =
+                this[POMODORO_DAILY_COMPLETED_COUNT_KEY] ?: 0,
+            pomodoroLastRecordDate =
+                this[POMODORO_LAST_RECORD_DATE_KEY].orEmpty()
+        )
     }
 
     private fun decodeBestMoves(encoded: String): Map<Int, Int> {
@@ -305,7 +446,6 @@ class ToolboxPreferencesRepository @Inject constructor(
             return emptyMap()
         }
 
-        // Encoded format: level:moves,level:moves
         return encoded
             .split(',')
             .mapNotNull { token ->
@@ -322,7 +462,6 @@ class ToolboxPreferencesRepository @Inject constructor(
     }
 
     private fun encodeBestMoves(values: Map<Int, Int>): String {
-        // Keep encoded data stable for diff-friendly storage.
         return values
             .toSortedMap()
             .entries
@@ -330,6 +469,8 @@ class ToolboxPreferencesRepository @Inject constructor(
     }
 
     private companion object {
+        private const val MAX_RECENT_TOOLS = 6
+
         val SIMPLE_DRAW_CANDIDATES_KEY = stringPreferencesKey("simple_draw_candidates")
         val SHAKE_DRAW_CANDIDATES_KEY = stringPreferencesKey("shake_draw_candidates")
         val SHAKE_GYROSCOPE_THRESHOLD_KEY = floatPreferencesKey("shake_gyroscope_threshold")
@@ -338,6 +479,15 @@ class ToolboxPreferencesRepository @Inject constructor(
         val SHAKE_COOLDOWN_MS_KEY = intPreferencesKey("shake_cooldown_ms")
         val DARK_THEME_CONFIG_KEY = stringPreferencesKey("dark_theme_config")
         val APP_THEME_COLOR_KEY = stringPreferencesKey("app_theme_color")
+        val FAVORITE_TOOL_IDS_KEY = stringPreferencesKey("favorite_tool_ids")
+        val RECENT_TOOL_IDS_KEY = stringPreferencesKey("recent_tool_ids")
+        val HIDDEN_TOOL_IDS_KEY = stringPreferencesKey("hidden_tool_ids")
+        val CUSTOM_TOOL_ORDER_KEY = stringPreferencesKey("custom_tool_order")
+        val TOOL_USAGE_STATS_KEY = stringPreferencesKey("tool_usage_stats")
+        val ACHIEVEMENT_STATES_KEY = stringPreferencesKey("achievement_states")
+        val LAST_USED_TOOL_ID_KEY = stringPreferencesKey("last_used_tool_id")
+        val LAST_USED_AT_KEY = longPreferencesKey("last_used_at")
+        val HOST_MODE_KEEP_SCREEN_ON_KEY = booleanPreferencesKey("host_mode_keep_screen_on")
         val MINESWEEPER_DIFFICULTY_KEY = stringPreferencesKey("minesweeper_difficulty")
         val MINESWEEPER_BOARD_WIDTH_KEY = intPreferencesKey("minesweeper_board_width")
         val MINESWEEPER_BOARD_HEIGHT_KEY = intPreferencesKey("minesweeper_board_height")
@@ -368,8 +518,10 @@ class ToolboxPreferencesRepository @Inject constructor(
         val POMODORO_WORK_DURATION_MIN_KEY = intPreferencesKey("pomodoro_work_duration_min")
         val POMODORO_BREAK_DURATION_MIN_KEY = intPreferencesKey("pomodoro_break_duration_min")
         val POMODORO_VIBRATION_ENABLED_KEY = booleanPreferencesKey("pomodoro_vibration_enabled")
-        val POMODORO_AUTO_SWITCH_ENABLED_KEY = booleanPreferencesKey("pomodoro_auto_switch_enabled")
-        val POMODORO_DAILY_COMPLETED_COUNT_KEY = intPreferencesKey("pomodoro_daily_completed_count")
+        val POMODORO_AUTO_SWITCH_ENABLED_KEY =
+            booleanPreferencesKey("pomodoro_auto_switch_enabled")
+        val POMODORO_DAILY_COMPLETED_COUNT_KEY =
+            intPreferencesKey("pomodoro_daily_completed_count")
         val POMODORO_LAST_RECORD_DATE_KEY = stringPreferencesKey("pomodoro_last_record_date")
     }
 }

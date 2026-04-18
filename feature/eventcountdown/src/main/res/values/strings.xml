@@ -1,0 +1,13 @@
+<resources>
+    <string name="event_countdown_title">活动倒计时</string>
+    <string name="event_countdown_back">返回</string>
+    <string name="event_countdown_ready_hint">等待开始</string>
+    <string name="event_countdown_finished">全部阶段已完成</string>
+    <string name="event_countdown_start">开始</string>
+    <string name="event_countdown_pause">暂停</string>
+    <string name="event_countdown_skip">跳过</string>
+    <string name="event_countdown_reset">重置</string>
+    <string name="event_countdown_stages_title">流程阶段</string>
+    <string name="event_countdown_stages_desc">每行使用“名称|分钟”格式，例如“集合|5”。</string>
+    <string name="event_countdown_stages_label">阶段列表</string>
+</resources>
