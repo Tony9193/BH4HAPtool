@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -42,12 +43,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.bh4haptool.BuildConfig
 import com.example.bh4haptool.R
 import com.example.bh4haptool.core.toolkit.data.AppThemeColor
 import com.example.bh4haptool.core.toolkit.data.DarkThemeConfig
 import com.example.bh4haptool.core.toolkit.data.ToolboxPreferencesRepository
+import com.example.bh4haptool.update.ReleaseUpdateInfo
+import com.example.bh4haptool.update.ReleaseUpdateRepository
+import com.example.bh4haptool.update.UpdateAvailableDialog
+import com.example.bh4haptool.update.UpdateCheckResult
+import com.example.bh4haptool.update.UpdateMessageDialog
 import com.example.bh4haptool.ui.theme.Blue40
 import com.example.bh4haptool.ui.theme.Gray40
 import com.example.bh4haptool.ui.theme.Green40
@@ -63,22 +71,59 @@ fun SettingsRoute(
     onManageHome: () -> Unit,
     onRecords: () -> Unit,
     onReleaseNotes: () -> Unit,
-    repository: ToolboxPreferencesRepository
+    repository: ToolboxPreferencesRepository,
+    updateRepository: ReleaseUpdateRepository
 ) {
+    val context = LocalContext.current
     val settings by repository.settingsFlow.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
     var confirmClearRecords by rememberSaveable { mutableStateOf(false) }
     var confirmResetPreferences by rememberSaveable { mutableStateOf(false) }
+    var isCheckingUpdate by rememberSaveable { mutableStateOf(false) }
+    var updateMessage by rememberSaveable { mutableStateOf<String?>(null) }
+    var availableUpdate by remember { mutableStateOf<ReleaseUpdateInfo?>(null) }
 
     settings?.let { currentSettings ->
         SettingsScreen(
+            currentVersionName = BuildConfig.VERSION_NAME,
             darkThemeConfig = currentSettings.darkThemeConfig,
             appThemeColor = currentSettings.appThemeColor,
             hostModeKeepScreenOn = currentSettings.hostModeKeepScreenOn,
+            updateAutoCheckEnabled = currentSettings.updateAutoCheckEnabled,
+            isCheckingUpdate = isCheckingUpdate,
             onDarkThemeConfigChange = { scope.launch { repository.updateDarkThemeConfig(it) } },
             onAppThemeColorChange = { scope.launch { repository.updateAppThemeColor(it) } },
             onHostModeKeepScreenOnChange = {
                 scope.launch { repository.updateHostModeKeepScreenOn(it) }
+            },
+            onUpdateAutoCheckEnabledChange = {
+                scope.launch { repository.updateAutoCheckEnabled(it) }
+            },
+            onCheckUpdates = {
+                if (isCheckingUpdate) {
+                    return@SettingsScreen
+                }
+                scope.launch {
+                    isCheckingUpdate = true
+                    when (val result = updateRepository.checkForUpdate(BuildConfig.VERSION_NAME)) {
+                        is UpdateCheckResult.HasUpdate -> {
+                            availableUpdate = result.release
+                            repository.recordUpdateCheck()
+                        }
+
+                        is UpdateCheckResult.UpToDate -> {
+                            updateMessage = context.getString(R.string.update_status_latest)
+                            repository.recordUpdateCheck()
+                            repository.updateIgnoredUpdateTag("")
+                        }
+
+                        is UpdateCheckResult.Error -> {
+                            updateMessage = result.message
+                            repository.recordUpdateCheck()
+                        }
+                    }
+                    isCheckingUpdate = false
+                }
             },
             onManageHome = onManageHome,
             onRecords = onRecords,
@@ -114,17 +159,50 @@ fun SettingsRoute(
             onDismiss = { confirmResetPreferences = false }
         )
     }
+
+    availableUpdate?.let { release ->
+        UpdateAvailableDialog(
+            currentVersionName = BuildConfig.VERSION_NAME,
+            release = release,
+            onUpdateNow = {
+                if (!updateRepository.openReleasePage(context, release)) {
+                    updateMessage = context.getString(R.string.update_status_browser_unavailable)
+                }
+                availableUpdate = null
+            },
+            onIgnore = {
+                scope.launch {
+                    repository.updateIgnoredUpdateTag(release.tagName)
+                }
+                availableUpdate = null
+            },
+            onDismiss = { availableUpdate = null }
+        )
+    }
+
+    updateMessage?.let { message ->
+        UpdateMessageDialog(
+            title = stringResource(R.string.settings_check_update_title),
+            message = message,
+            onDismiss = { updateMessage = null }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    currentVersionName: String,
     darkThemeConfig: DarkThemeConfig,
     appThemeColor: AppThemeColor,
     hostModeKeepScreenOn: Boolean,
+    updateAutoCheckEnabled: Boolean,
+    isCheckingUpdate: Boolean,
     onDarkThemeConfigChange: (DarkThemeConfig) -> Unit,
     onAppThemeColorChange: (AppThemeColor) -> Unit,
     onHostModeKeepScreenOnChange: (Boolean) -> Unit,
+    onUpdateAutoCheckEnabledChange: (Boolean) -> Unit,
+    onCheckUpdates: () -> Unit,
     onManageHome: () -> Unit,
     onRecords: () -> Unit,
     onReleaseNotes: () -> Unit,
@@ -184,6 +262,46 @@ fun SettingsScreen(
                         subtitle = stringResource(R.string.settings_release_notes_desc),
                         onClick = onReleaseNotes
                     )
+                }
+            }
+            item {
+                SectionBlock(title = stringResource(R.string.settings_update_section)) {
+                    SettingsLinkRow(
+                        title = stringResource(R.string.settings_check_update_title),
+                        subtitle = if (isCheckingUpdate) {
+                            stringResource(R.string.settings_check_update_checking_desc)
+                        } else {
+                            stringResource(R.string.settings_check_update_desc, currentVersionName)
+                        },
+                        actionLabel = if (isCheckingUpdate) {
+                            stringResource(R.string.settings_check_update_checking_action)
+                        } else {
+                            stringResource(R.string.settings_check_update_action)
+                        },
+                        enabled = !isCheckingUpdate,
+                        onClick = onCheckUpdates
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_auto_check_update_title),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_auto_check_update_desc),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = updateAutoCheckEnabled,
+                            onCheckedChange = onUpdateAutoCheckEnabledChange
+                        )
+                    }
                 }
             }
             item {
@@ -341,12 +459,14 @@ private fun SectionBlock(
 private fun SettingsLinkRow(
     title: String,
     subtitle: String,
+    actionLabel: String? = null,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -359,9 +479,13 @@ private fun SettingsLinkRow(
             )
         }
         Text(
-            text = stringResource(R.string.settings_open_label),
+            text = actionLabel ?: stringResource(R.string.settings_open_label),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = if (enabled) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
         )
     }
 }

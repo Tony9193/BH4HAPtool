@@ -78,6 +78,28 @@ class ToolboxPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateAutoCheckEnabled(enabled: Boolean) {
+        context.toolboxDataStore.edit { preferences ->
+            preferences[UPDATE_AUTO_CHECK_ENABLED_KEY] = enabled
+        }
+    }
+
+    suspend fun updateIgnoredUpdateTag(tag: String) {
+        context.toolboxDataStore.edit { preferences ->
+            if (tag.isBlank()) {
+                preferences.remove(IGNORED_UPDATE_TAG_KEY)
+            } else {
+                preferences[IGNORED_UPDATE_TAG_KEY] = tag
+            }
+        }
+    }
+
+    suspend fun recordUpdateCheck(checkedAtMillis: Long = System.currentTimeMillis()) {
+        context.toolboxDataStore.edit { preferences ->
+            preferences[LAST_UPDATE_CHECK_AT_KEY] = checkedAtMillis
+        }
+    }
+
     suspend fun setToolFavorite(toolId: String, favorite: Boolean) {
         context.toolboxDataStore.edit { preferences ->
             val favorites = ToolboxProgressCodec.decodeIdList(
@@ -430,6 +452,9 @@ class ToolboxPreferencesRepository @Inject constructor(
             lastUsedToolId = this[LAST_USED_TOOL_ID_KEY].orEmpty(),
             lastUsedAtMillis = this[LAST_USED_AT_KEY] ?: 0L,
             hostModeKeepScreenOn = this[HOST_MODE_KEEP_SCREEN_ON_KEY] ?: true,
+            updateAutoCheckEnabled = this[UPDATE_AUTO_CHECK_ENABLED_KEY] ?: true,
+            ignoredUpdateTag = this[IGNORED_UPDATE_TAG_KEY].orEmpty(),
+            lastUpdateCheckAtMillis = this[LAST_UPDATE_CHECK_AT_KEY] ?: 0L,
             minesweeperDifficulty = runCatching {
                 MinesweeperDifficulty.valueOf(
                     this[MINESWEEPER_DIFFICULTY_KEY] ?: MinesweeperDifficulty.NORMAL.name
@@ -536,6 +561,9 @@ class ToolboxPreferencesRepository @Inject constructor(
         val LAST_USED_TOOL_ID_KEY = stringPreferencesKey("last_used_tool_id")
         val LAST_USED_AT_KEY = longPreferencesKey("last_used_at")
         val HOST_MODE_KEEP_SCREEN_ON_KEY = booleanPreferencesKey("host_mode_keep_screen_on")
+        val UPDATE_AUTO_CHECK_ENABLED_KEY = booleanPreferencesKey("update_auto_check_enabled")
+        val IGNORED_UPDATE_TAG_KEY = stringPreferencesKey("ignored_update_tag")
+        val LAST_UPDATE_CHECK_AT_KEY = longPreferencesKey("last_update_check_at")
         val MINESWEEPER_DIFFICULTY_KEY = stringPreferencesKey("minesweeper_difficulty")
         val MINESWEEPER_BOARD_WIDTH_KEY = intPreferencesKey("minesweeper_board_width")
         val MINESWEEPER_BOARD_HEIGHT_KEY = intPreferencesKey("minesweeper_board_height")

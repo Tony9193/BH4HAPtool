@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.bh4haptool.core.toolkit.data.ToolboxPreferencesRepository
 import com.example.bh4haptool.navigation.AppNavHost
+import com.example.bh4haptool.update.ReleaseUpdateRepository
 import com.example.bh4haptool.ui.theme.BH4HAPtoolTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -21,6 +22,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var repository: ToolboxPreferencesRepository
+
+    @Inject
+    lateinit var updateRepository: ReleaseUpdateRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +38,25 @@ class MainActivity : ComponentActivity() {
                 darkThemeConfig = dConfig,
                 appThemeColor = aConfig
             ) {
-                BH4HAPtoolApp(modifier = Modifier.fillMaxSize(), repository = repository)
+                BH4HAPtoolApp(
+                    modifier = Modifier.fillMaxSize(),
+                    repository = repository,
+                    updateRepository = updateRepository
+                )
             }
         }
     }
 }
 
 @Composable
-fun BH4HAPtoolApp(modifier: Modifier = Modifier, repository: ToolboxPreferencesRepository) {
-    AppNavHost(modifier = modifier, repository = repository)
+fun BH4HAPtoolApp(
+    modifier: Modifier = Modifier,
+    repository: ToolboxPreferencesRepository,
+    updateRepository: ReleaseUpdateRepository
+) {
+    AppNavHost(
+        modifier = modifier,
+        repository = repository,
+        updateRepository = updateRepository
+    )
 }

@@ -73,6 +73,14 @@
     <string name="settings_records_desc">查看游戏成绩、使用统计和成就。</string>
     <string name="settings_release_notes_title">版本更新</string>
     <string name="settings_release_notes_desc">查看内置离线更新说明。</string>
+    <string name="settings_update_section">应用更新</string>
+    <string name="settings_check_update_title">检查更新</string>
+    <string name="settings_check_update_desc">当前版本 %1$s，检查 GitHub Releases 是否有新版本。</string>
+    <string name="settings_check_update_action">检查</string>
+    <string name="settings_check_update_checking_desc">正在连接 GitHub Releases 检查最新版本，请稍候。</string>
+    <string name="settings_check_update_checking_action">检查中</string>
+    <string name="settings_auto_check_update_title">启动时自动检查更新</string>
+    <string name="settings_auto_check_update_desc">发现新版本时会自动弹窗提醒，并可跳转浏览器下载。</string>
     <string name="settings_host_mode_section">主持模式</string>
     <string name="settings_host_mode_keep_screen_on">活动工具运行时保持屏幕常亮</string>
     <string name="settings_host_mode_keep_screen_on_desc">对倒计时等主持场景生效，方便现场控场。</string>
@@ -85,6 +93,17 @@
     <string name="settings_reset_all_confirm">确认重置</string>
     <string name="settings_open_label">打开</string>
     <string name="settings_dialog_cancel">取消</string>
+    <string name="update_dialog_title">发现新版本 %1$s</string>
+    <string name="update_dialog_version_summary">当前版本 %1$s，可更新到 %2$s。</string>
+    <string name="update_dialog_published_at">发布时间：%1$s</string>
+    <string name="update_dialog_no_notes">这个版本暂时没有附带详细更新说明。</string>
+    <string name="update_dialog_download_now">立即下载</string>
+    <string name="update_dialog_open_release">前往发布页</string>
+    <string name="update_dialog_ignore">忽略此版本</string>
+    <string name="update_dialog_later">稍后再说</string>
+    <string name="update_dialog_acknowledge">知道了</string>
+    <string name="update_status_latest">当前已经是最新版本。</string>
+    <string name="update_status_browser_unavailable">当前设备无法打开浏览器，请稍后再试。</string>
 
     <string name="home_manage_reset">恢复默认</string>
     <string name="home_manage_description">这里可以管理首页展示顺序、收藏状态和隐藏状态。当前版本支持上移/下移排序。</string>
